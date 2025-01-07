@@ -21,8 +21,9 @@ plugins {
     id("com.vanniktech.maven.publish") version "0.30.0"
 }
 
-group = "canaryprism"
-version = "1.0-SNAPSHOT"
+group = "io.github.canary-prism"
+description = "Minesweeper backend thing for Java"
+version = "1.0.0"
 
 repositories {
     mavenCentral()
@@ -53,7 +54,7 @@ mavenPublishing {
         name = project.name
         description = project.description
 
-        url = "https://github.com/Canary-Prism/slavacord"
+        url = "https://github.com/Canary-Prism/minsweeper-java"
 
         licenses {
             license {
@@ -71,9 +72,9 @@ mavenPublishing {
         }
 
         scm {
-            url = "https://github.com/Canary-Prism/slavacord"
-            connection = "scm:git:git://github.com/Canary-Prism/slavacord.git"
-            developerConnection = "scm:git:ssh://git@github.com:Canary-Prism/slavacord.git"
+            url = "https://github.com/Canary-Prism/minsweeper-java"
+            connection = "scm:git:git://github.com/Canary-Prism/minsweeper-java.git"
+            developerConnection = "scm:git:ssh://git@github.com:Canary-Prism/minsweeper-java.git"
         }
     }
 }
