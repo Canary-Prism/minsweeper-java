@@ -74,6 +74,8 @@ public class Board extends ArrayList<ArrayList<Cell>> {
     
     @Override
     public Board clone() {
-        return ((Board) super.clone());
+        return this.stream()
+                .map((e) -> ((ArrayList<Cell>) e.clone()))
+                .collect(Collectors.toCollection(() -> new Board(size, null)));
     }
 }
