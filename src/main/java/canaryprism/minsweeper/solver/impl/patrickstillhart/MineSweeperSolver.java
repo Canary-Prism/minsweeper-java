@@ -373,7 +373,7 @@ public class MineSweeperSolver implements Solver {
      * @param depth which depth lvl we're in
      */
      void tankRecurse(GameState state, ArrayList<Point> borderTiles, int depth, Cell[][] tankBoard, boolean[][] knownMine, boolean[][] knownEmpty, ArrayList<boolean[]> tankSolutions, boolean borderOptimization) {
-         System.out.println("recurse");
+//         System.out.println("recurse");
         var size = state.board().getSize();
         
         // Return if at this point, it's already inconsistent

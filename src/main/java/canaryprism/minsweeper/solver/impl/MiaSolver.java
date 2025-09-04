@@ -252,13 +252,13 @@ public class MiaSolver implements Solver {
                 }
             }
         }
-        System.out.println();
-        System.out.println("empties: " + empties.size());
-        System.out.println("adjacents: " + adjacents.size());
+//        System.out.println();
+//        System.out.println("empties: " + empties.size());
+//        System.out.println("adjacents: " + adjacents.size());
         if (empties.size() < BRUTE_FORCE_LIMIT) {
-            System.out.println("brute forcing");
-            var start = System.nanoTime();
-            try {
+//            System.out.println("brute forcing");
+//            var start = System.nanoTime();
+//            try {
                 
                 var states = bruteForce(adjacents.stream().toList(), 0, state)
                         .collect(Collectors.toSet());
@@ -272,23 +272,23 @@ public class MiaSolver implements Solver {
                         if (states.stream()
                                 .allMatch((e) ->
                                         e.board().get(point.x(), point.y()) instanceof Cell.Unknown)) {
-                            System.out.println("brute force solution");
+//                            System.out.println("brute force solution");
                             return new Move(point, Move.Click.LEFT);
                         }
                         if (states.stream()
                                 .allMatch((e) ->
                                         e.board().get(point.x(), point.y()) instanceof Cell.MarkedMine)) {
-                            System.out.println("brute force solution");
+//                            System.out.println("brute force solution");
                             return new Move(point, Move.Click.RIGHT);
                         }
                     }
                 }
-                System.out.println("brute force without solution");
-            } finally {
-                System.out.printf("spent %.6f secs\n", (System.nanoTime() - start) / 1_000_000_000.0);
-            }
+//                System.out.println("brute force without solution");
+//            } finally {
+//                System.out.printf("spent %.6f secs\n", (System.nanoTime() - start) / 1_000_000_000.0);
+//            }
         } else {
-            System.out.println("skipping brute force: too many combinations");
+//            System.out.println("skipping brute force: too many combinations");
         }
         
         
