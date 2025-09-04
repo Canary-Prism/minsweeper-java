@@ -1,5 +1,5 @@
 /*
- *    Copyright 2024 Canary Prism <canaryprsn@gmail.com>
+ *    Copyright 2025 Canary Prism <canaryprsn@gmail.com>
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -14,12 +14,16 @@
  *    limitations under the License.
  */
 
-/// Module of Minsweeper
-module canaryprism.minsweeper {
-    exports canaryprism.minsweeper;
-    exports canaryprism.minsweeper.solver;
+package canaryprism.minsweeper.solver;
+
+public record Move(Point point, Click action) {
+    public Move(int x, int y, Click action) {
+        this(new Point(x, y), action);
+    }
+    public record Point(int x, int y) {
     
-    provides canaryprism.minsweeper.solver.Solver with
-            canaryprism.minsweeper.solver.impl.MiaSolver,
-            canaryprism.minsweeper.solver.impl.patrickstillhart.MineSweeperSolver;
+    }
+    public enum Click {
+        LEFT, RIGHT
+    }
 }

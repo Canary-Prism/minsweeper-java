@@ -16,6 +16,13 @@
 
 package canaryprism.minsweeper;
 
+import canaryprism.minsweeper.solver.Move;
+import canaryprism.minsweeper.solver.Solver;
+
+import java.util.HashSet;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutorCompletionService;
+import java.util.concurrent.ForkJoinPool;
 import java.util.concurrent.ThreadLocalRandom;
 
 /// Main class of minsweeper game
@@ -26,10 +33,21 @@ public class Minsweeper {
     private final Runnable on_win;
     private final Runnable on_lose;
     
-    private GameState gamestate = new GameState(GameStatus.NEVER, new Board(), -1);
+    private GameState gamestate;
+    
+    private Solver solver;
+    
+    private Minsweeper(GameState state) {
+        this.sizes = state.board().getSize();
+        this.on_win = () -> {};
+        this.on_lose = () -> {};
+        this.gamestate = state;
+        this.first = false;
+    }
     
     public Minsweeper(BoardSize sizes, Runnable on_win, Runnable on_lose) {
         this.sizes = sizes;
+        this.gamestate = new GameState(GameStatus.NEVER, new Board(sizes), -1);
         this.on_win = on_win;
         this.on_lose = on_lose;
     }
@@ -47,8 +65,20 @@ public class Minsweeper {
     }
     
     public GameState start() {
-        var temp_board = new Board(sizes.width(), sizes.height());
+        return start(null);
+    }
+    public GameState start(Solver solver) {
+        this.solver = solver;
         
+        this.gamestate = generateGame();
+        
+        this.first = true;
+        
+        return gamestate.hideMines();
+    }
+    
+    private GameState generateGame() {
+        var temp_board = new Board(sizes);
         var mines = 0;
         while (mines < sizes.mines()) {
             var x = ThreadLocalRandom.current().nextInt(sizes.width());
@@ -62,11 +92,49 @@ public class Minsweeper {
         
         generateNmbers(temp_board);
         
-        this.gamestate = new GameState(GameStatus.PLAYING, temp_board, sizes.mines());
-        
-        this.first = true;
-        
-        return gamestate.hideMines();
+        return new GameState(GameStatus.PLAYING, temp_board, sizes.mines());
+    }
+    
+    private GameState generateGame(int x, int y) {
+        generation_attempt:
+        while (true) {
+            var board = new Board(sizes);
+            var mines = 0;
+            var points = new HashSet<Move.Point>();
+            while (mines < sizes.mines()) {
+                var x2 = ThreadLocalRandom.current().nextInt(sizes.width());
+                var y2 = ThreadLocalRandom.current().nextInt(sizes.height());
+                if (x2 == x || y2 == y)
+                    continue;
+                
+                if (!points.add(new Move.Point(x2, y2))) {
+                    if (points.size() == sizes.mines())
+                        continue generation_attempt;
+                    continue;
+                }
+                var board_copy = board.clone();
+                if (board_copy.get(x2, y2) instanceof Cell.Unknown) {
+                    board_copy.set(x2, y2, Cell.Mine.INSTANCE);
+                    generateNmbers(board_copy);
+                    if (this.solver != null) {
+                        var state = new GameState(GameStatus.PLAYING, board_copy, mines);
+                        var game = new Minsweeper(state);
+                        state = game.leftClick(x, y);
+                        if (solver.solve(game, state) == Solver.Result.WON) {
+                            board = board_copy;
+                            points.clear();
+                            mines++;
+                        }
+                    } else {
+                        board = board_copy;
+                        points.clear();
+                        mines++;
+                    }
+                }
+            }
+            
+            return new GameState(GameStatus.PLAYING, board, sizes.mines());
+        }
     }
     
     private void generateNmbers(Board board) {
@@ -144,6 +212,39 @@ public class Minsweeper {
     public GameState reveal(int x, int y) {
         if (gamestate.status() != GameStatus.PLAYING) return gamestate;
         if (!(x >= 0 && x < sizes.width() && y >= 0 && y < sizes.height())) return gamestate.hideMines();
+        if (this.solver != null && this.first) {
+            this.first = false;
+//            this.gamestate = generateGame(x, y);
+            var solver = this.solver;
+            var future = new CompletableFuture<GameState>();
+            final var batch_amount = 30;
+            var ecs = new ExecutorCompletionService<GameState>(ForkJoinPool.commonPool());
+            solver_loop:
+            while (true) {
+                for (int i = 0; i < batch_amount; i++) {
+                    ecs.submit(() -> {
+                        var original_state = generateGame();
+                        var game = new Minsweeper(original_state.clone());
+                        var state = game.reveal(x, y);
+                        var result = solver.solve(game, state);
+
+                        if (result == Solver.Result.WON) {
+                            return original_state;
+                        }
+                        throw new RuntimeException();
+                    });
+                }
+
+                for (int i = 0; i < batch_amount; i++) {
+                    try {
+                        this.gamestate = ecs.take().resultNow();
+                        break solver_loop;
+                    } catch (InterruptedException e) {
+                        throw new RuntimeException(e);
+                    } catch (IllegalStateException e) {}
+                }
+            }
+        }
         
         var board = gamestate.board().clone();
         

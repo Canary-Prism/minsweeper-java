@@ -22,20 +22,33 @@ import java.util.stream.Stream;
 
 public class Board extends ArrayList<ArrayList<Cell>> {
     
-    public Board() {
+    private final BoardSize size;
+    
+    private Board(BoardSize size, Void ignored) {
         super();
+        this.size = size;
     }
     
-    public Board(int width, int height) {
-        super();
+    public Board(BoardSize size, Cell fill) {
+        this(size, ((Void) null));
         
-        var row = Stream.generate(() -> new Cell.Unknown(0))
+        var width = size.width();
+        var height = size.height();
+        
+        var row = Stream.generate(() -> fill)
                 .limit(width)
                 .collect(Collectors.toCollection(ArrayList<Cell>::new));
         
         Stream.generate(() -> new ArrayList<>(row))
                 .limit(height)
                 .forEach(this::add);
+    }
+    public Board(BoardSize size) {
+        this(size, new Cell.Unknown(0));
+    }
+    
+    public BoardSize getSize() {
+        return size;
     }
     
     /// Gets a cell from the board in a way that is easier to read
@@ -47,7 +60,7 @@ public class Board extends ArrayList<ArrayList<Cell>> {
         return this.get(y).get(x);
     }
     
-    void set(int x, int y, Cell cell) {
+    public void set(int x, int y, Cell cell) {
         this.get(y).set(x, cell);
     }
     
@@ -61,7 +74,7 @@ public class Board extends ArrayList<ArrayList<Cell>> {
                             default -> cell;
                         })
                         .collect(Collectors.toCollection(ArrayList::new)))
-                .collect(Collectors.toCollection(Board::new));
+                .collect(Collectors.toCollection(() -> new Board(size, ((Void) null))));
     }
     
     boolean hasWon() {
@@ -77,6 +90,6 @@ public class Board extends ArrayList<ArrayList<Cell>> {
     public Board clone() {
         return this.stream()
                 .map((e) -> ((ArrayList<Cell>) e.clone()))
-                .collect(Collectors.toCollection(() -> new Board(size, null)));
+                .collect(Collectors.toCollection(() -> new Board(size, ((Void) null))));
     }
 }

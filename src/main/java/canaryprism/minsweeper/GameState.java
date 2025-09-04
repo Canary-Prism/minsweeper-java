@@ -17,7 +17,7 @@
 package canaryprism.minsweeper;
 
 /// Represents the state of the game
-public record GameState(GameStatus status, Board board, int remainingMines) {
+public record GameState(GameStatus status, Board board, int remainingMines) implements Cloneable {
     
     GameState withStatus(GameStatus status) {
         return new GameState(status, board, remainingMines);
