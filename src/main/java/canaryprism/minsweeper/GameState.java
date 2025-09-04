@@ -34,4 +34,10 @@ public record GameState(GameStatus status, Board board, int remainingMines) {
     GameState hideMines() {
         return new GameState(status, board.hideMines(), remainingMines);
     }
+    
+    @SuppressWarnings("MethodDoesntCallSuperMethod")
+    @Override
+    public GameState clone() {
+        return new GameState(status, board.clone(), remainingMines);
+    }
 }
