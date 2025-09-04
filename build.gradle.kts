@@ -14,16 +14,15 @@
  *    limitations under the License.
  */
 
-import com.vanniktech.maven.publish.SonatypeHost
 
 plugins {
     `java-library`
-    id("com.vanniktech.maven.publish") version "0.30.0"
+    id("com.vanniktech.maven.publish") version "0.34.0"
 }
 
 group = "io.github.canary-prism"
 description = "Minesweeper backend thing for Java"
-version = "1.1.0"
+version = "1.1.1"
 
 repositories {
     mavenCentral()
@@ -45,7 +44,7 @@ java {
 }
 
 mavenPublishing {
-    publishToMavenCentral(SonatypeHost.CENTRAL_PORTAL)
+    publishToMavenCentral(true)
 
     signAllPublications()
 
