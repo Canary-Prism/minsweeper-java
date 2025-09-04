@@ -72,6 +72,7 @@ public class Board extends ArrayList<ArrayList<Cell>> {
                 .isEmpty();
     }
     
+    @SuppressWarnings({ "unchecked", "MethodDoesntCallSuperMethod" })
     @Override
     public Board clone() {
         return this.stream()
