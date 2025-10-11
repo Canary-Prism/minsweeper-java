@@ -117,7 +117,6 @@ public final class MinsweeperGame extends AbstractRandomMinsweeper {
                 var result = solver.solve(game, state);
                 
                 if (result == Solver.Result.WON) {
-                    System.out.println("solution");
                     this.gamestate = original_state;
 //                                        this.gamestate = original_state;
                     break;
