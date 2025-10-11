@@ -67,10 +67,7 @@ public class Board extends ArrayList<ArrayList<Cell>> {
     Board hideMines() {
         return this.stream()
                 .map((row) -> row.stream()
-                        .map((cell) -> (cell.state() != CellState.REVEALED) ? switch (cell.type()) {
-                            case CellType.Mine ignored -> new Cell(CellType.UNKNOWN, cell.state());
-                            default -> cell;
-                        } : cell)
+                        .map((cell) -> (cell.state() != CellState.REVEALED) ? new Cell(CellType.UNKNOWN, cell.state()) : cell)
                         .collect(Collectors.toCollection(ArrayList::new)))
                 .collect(Collectors.toCollection(() -> new Board(size, ((Void) null))));
     }
