@@ -188,7 +188,7 @@ public abstract class AbstractMinsweeper implements Minsweeper {
         var remaining_mines = gamestate.remainingMines();
         
         remaining_mines += (flagged != (state == CellState.FLAGGED)) ?
-                ((flagged) ? 1 : -1) : 0;
+                ((flagged) ? -1 : 1) : 0;
         
         board.set(x, y, new Cell(type, (flagged) ? CellState.FLAGGED : CellState.UNKNOWN));
         
