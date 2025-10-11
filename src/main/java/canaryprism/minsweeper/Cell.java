@@ -16,55 +16,6 @@
 
 package canaryprism.minsweeper;
 
-public sealed interface Cell {
-    
-    record Revealed(int number) implements Cell {
-        
-        @Override
-        public String toString() {
-            return (number == 0) ? " " : String.valueOf(number);
-        }
-    }
-    record Unknown(int number) implements Cell {
-        
-        @Override
-        public String toString() {
-            return (number == 0) ? "O" : String.valueOf(number);
-        }
-    }
-    
-    enum MarkedMine implements Cell {
-        INSTANCE;
-        
-        @Override
-        public String toString() {
-            return "!";
-        }
-    }
-    
-    enum Mine implements Cell {
-        INSTANCE;
-        
-        @Override
-        public String toString() {
-            return "*";
-        }
-    }
-    
-    record FalseMine(int value) implements Cell {
-        
-        @Override
-        public String toString() {
-            return "Ø";
-        }
-    }
-    
-    enum ExplodedMine implements Cell {
-        INSTANCE;
-        
-        @Override
-        public String toString() {
-            return "X";
-        }
-    }
+public record Cell(CellType type, CellState state) {
+
 }

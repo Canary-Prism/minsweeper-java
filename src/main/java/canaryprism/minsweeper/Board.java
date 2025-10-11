@@ -44,7 +44,7 @@ public class Board extends ArrayList<ArrayList<Cell>> {
                 .forEach(this::add);
     }
     public Board(BoardSize size) {
-        this(size, new Cell.Unknown(0));
+        this(size, new Cell(CellType.Safe.EMPTY, CellState.UNKNOWN));
     }
     
     public BoardSize getSize() {
@@ -67,12 +67,10 @@ public class Board extends ArrayList<ArrayList<Cell>> {
     Board hideMines() {
         return this.stream()
                 .map((row) -> row.stream()
-                        .map((cell) -> switch (cell) {
-                            case Cell.Mine ignored -> new Cell.Unknown(0);
-                            case Cell.Unknown ignored -> new Cell.Unknown(0);
-                            case Cell.FalseMine ignored -> Cell.MarkedMine.INSTANCE;
+                        .map((cell) -> (cell.state() != CellState.REVEALED) ? switch (cell.type()) {
+                            case CellType.Mine ignored -> new Cell(CellType.UNKNOWN, cell.state());
                             default -> cell;
-                        })
+                        } : cell)
                         .collect(Collectors.toCollection(ArrayList::new)))
                 .collect(Collectors.toCollection(() -> new Board(size, ((Void) null))));
     }
@@ -80,9 +78,8 @@ public class Board extends ArrayList<ArrayList<Cell>> {
     boolean hasWon() {
         return this.stream()
                 .flatMap(ArrayList::stream)
-                .filter((cell) -> cell instanceof Cell.Unknown || cell instanceof Cell.FalseMine)
-                .findAny()
-                .isEmpty();
+                .noneMatch((cell) -> (cell.type() == CellType.MINE && cell.state() == CellState.REVEALED)
+                        || (cell.type() instanceof CellType.Safe && cell.state() != CellState.REVEALED));
     }
     
     @SuppressWarnings({ "unchecked", "MethodDoesntCallSuperMethod" })

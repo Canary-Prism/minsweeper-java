@@ -19,14 +19,15 @@ package canaryprism.minsweeper.solver;
 import canaryprism.minsweeper.GameState;
 import canaryprism.minsweeper.GameStatus;
 import canaryprism.minsweeper.Minsweeper;
+import canaryprism.minsweeper.MinsweeperGame;
 import canaryprism.minsweeper.solver.impl.MiaSolver;
 
-/// Solver is a type that is capable of solving [canaryprism.minsweeper.Minsweeper] games
+/// Solver is a type that is capable of solving [MinsweeperGame] games
 ///
 /// Solvers are forbidden from making guesses, it will only perform a move
 /// if it is 100% certain it is safe
 ///
-/// if a Solver is to be used to generate a game by [Minsweeper#start(Solver)], it should prioritise
+/// if a Solver is to be used to generate a game by [MinsweeperGame#start(Solver)], it should prioritise
 /// at least a little bit of speed, it's fine if a Solver chooses to resign if continuing would
 /// result in too much of a time loss (around 3 seconds is the worst case limit probably)
 ///

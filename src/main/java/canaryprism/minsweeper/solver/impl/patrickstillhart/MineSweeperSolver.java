@@ -22,9 +22,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-import canaryprism.minsweeper.Board;
-import canaryprism.minsweeper.Cell;
-import canaryprism.minsweeper.GameState;
+import canaryprism.minsweeper.*;
 import canaryprism.minsweeper.solver.Move;
 import canaryprism.minsweeper.solver.Move.Point;
 import canaryprism.minsweeper.solver.Solver;
@@ -49,7 +47,7 @@ public class MineSweeperSolver implements Solver {
         
         for (int y = 0; y < size.height(); y++) {
             for (int x = 0; x < size.width(); x++) {
-                if (state.board().get(x, y) instanceof Cell.Revealed(var number) && number > 0) {
+                if (state.board().get(x, y).type() instanceof CellType.Safe(var number) && number > 0) {
                     if (solveSingle(state, x, y) instanceof Move move)
                         return move;
                 }
@@ -70,18 +68,18 @@ public class MineSweeperSolver implements Solver {
      * @param y you seriously should understand it
      */
     private Move solveSingle(GameState state, int x, int y) {
-        if (!(state.board().get(x, y) instanceof Cell.Revealed(int number) && number > 0))
+        if (!(state.board().get(x, y).type() instanceof CellType.Safe(int number) && number > 0))
             return null;
-        int countClosed = getSurroundingByPredicate(state, x, y, (e) -> e instanceof Cell.Unknown);
+        int countClosed = getSurroundingByPredicate(state, x, y, (e) -> e.state() == CellState.UNKNOWN);
         if (countClosed == 0) return null;
 
-        int countAlreadyFlagged = getSurroundingByPredicate(state, x, y, (e) -> e instanceof Cell.MarkedMine);
+        int countAlreadyFlagged = getSurroundingByPredicate(state, x, y, (e) -> e.state() == CellState.FLAGGED);
         
         // First: flag as much as we can
         if (number == countClosed + countAlreadyFlagged) {
             for (int y3 = max(0, y - 1); y3 <= min(state.board().getSize().height() - 1, y + 1); y3++) {
                 for (int x3 = max(0, x - 1); x3 <= min(state.board().getSize().width() - 1, x + 1); x3++) {
-                    if (state.board().get(x3, y3) instanceof Cell.Unknown) {
+                    if (state.board().get(x3, y3).state() == CellState.UNKNOWN) {
                         
                         return new Move(x3, y3, Move.Click.RIGHT);
                     }
@@ -137,21 +135,21 @@ public class MineSweeperSolver implements Solver {
      * @return true if it is a boundary block
      */
     private boolean isBoundary(GameState state, int x, int y) {
-        if (!(state.board().get(x, y) instanceof Cell.Unknown)) return false;
+        if (!(state.board().get(x, y).state() == CellState.UNKNOWN)) return false;
 
         if (y > 0) {
-            if (x > 0 && state.board().get(x - 1, y - 1) instanceof Cell.Revealed) return true; // top ■□□
-            if (state.board().get(x, y - 1) instanceof Cell.Revealed) return true;   // top □■□
-            if (x < state.board().getSize().width() - 1 && state.board().get(x + 1, y - 1) instanceof Cell.Revealed) return true; // top □□■
+            if (x > 0 && state.board().get(x - 1, y - 1).state() == CellState.REVEALED) return true; // top ■□□
+            if (state.board().get(x, y - 1).state() == CellState.REVEALED) return true;   // top □■□
+            if (x < state.board().getSize().width() - 1 && state.board().get(x + 1, y - 1).state() == CellState.REVEALED) return true; // top □□■
         }
 
-        if (x > 0 && state.board().get(x - 1, y) instanceof Cell.Revealed) return true; // middle ■□□
-        if (x < state.board().getSize().width() - 1 && state.board().get(x + 1, y) instanceof Cell.Revealed) return true; // middle □□■
+        if (x > 0 && state.board().get(x - 1, y).state() == CellState.REVEALED) return true; // middle ■□□
+        if (x < state.board().getSize().width() - 1 && state.board().get(x + 1, y).state() == CellState.REVEALED) return true; // middle □□■
 
         if (y < state.board().getSize().height() - 1) {
-            if (x > 0 && state.board().get(x - 1, y + 1) instanceof Cell.Revealed) return true; // bottom ■□□
-            if (state.board().get(x, y + 1) instanceof Cell.Revealed) return true;   // bottom □■□
-            if (x < state.board().getSize().width() - 1 && state.board().get(x + 1, y + 1) instanceof Cell.Revealed) return true; // bottom □□■
+            if (x > 0 && state.board().get(x - 1, y + 1).state() == CellState.REVEALED) return true; // bottom ■□□
+            if (state.board().get(x, y + 1).state() == CellState.REVEALED) return true;   // bottom □■□
+            if (x < state.board().getSize().width() - 1 && state.board().get(x + 1, y + 1).state() == CellState.REVEALED) return true; // bottom □□■
         }
 
         return false;
@@ -213,12 +211,12 @@ public class MineSweeperSolver implements Solver {
         borderOptimization = false;
         for (int x = 0; x < state.board().getSize().width(); x++)
             for (int y = 0; y < state.board().getSize().height(); y++)
-                if (state.board().get(x, y) instanceof Cell.Unknown && state.board().get(x, y) instanceof Cell.MarkedMine) allEmptyBlocks.add(new Point(x, y));
+                if (state.board().get(x, y).state() == CellState.UNKNOWN && state.board().get(x, y).state() == CellState.FLAGGED) allEmptyBlocks.add(new Point(x, y));
 
         // Determine all border tiles
         for (int x = 0; x < state.board().getSize().width(); x++)
             for (int y = 0; y < state.board().getSize().height(); y++)
-                if (isBoundary(state, x, y) && !(state.board().get(x, y) instanceof Cell.MarkedMine)) borderBlocks.add(new Point(x, y));
+                if (isBoundary(state, x, y) && !(state.board().get(x, y).state() == CellState.FLAGGED)) borderBlocks.add(new Point(x, y));
 
         // Count how many blocks outside the knowable range
         int countBlocksOutOfRange = allEmptyBlocks.size() - borderBlocks.size();
@@ -253,7 +251,7 @@ public class MineSweeperSolver implements Solver {
             knownMine = new boolean[state.board().getSize().width()][state.board().getSize().height()];
             for (int x = 0; x < state.board().getSize().width(); x++) {
                 for (int y = 0; y < state.board().getSize().height(); y++) {
-                    knownMine[x][y] = state.board().get(x, y) instanceof Cell.MarkedMine;
+                    knownMine[x][y] = state.board().get(x, y).state() == CellState.FLAGGED;
                     
                 }
             }
@@ -261,7 +259,7 @@ public class MineSweeperSolver implements Solver {
             knownEmpty = new boolean[state.board().getSize().width()][state.board().getSize().height()];
             for (int x = 0; x < state.board().getSize().width(); x++) {
                 for (int y = 0; y < state.board().getSize().height(); y++) {
-                    knownEmpty[x][y] = tankBoard[x][y] instanceof Cell.Revealed(var number) && number == 0;
+                    knownEmpty[x][y] = tankBoard[x][y].type() instanceof CellType.Safe(var number) && number == 0;
                 }
             }
 
@@ -342,7 +340,7 @@ public class MineSweeperSolver implements Solver {
                         // Perform a search on all the blocks
                         blockSearch: for (int x = 0; x < size.width(); x++) {
                             for (int y = 0; y < size.height(); y++) {
-                                if (state.board().get(x, y) instanceof Cell.Revealed(var number) && number > 0) {
+                                if (state.board().get(x, y).type() instanceof CellType.Safe(var number) && number > 0) {
                                     if (Math.abs(block.x() - x) <= 1 && Math.abs(block.y() - y) <= 1 && Math.abs(compareBlock.x() - x) <= 1 && Math.abs(compareBlock.y() - y) <= 1) {
                                         isConnected = true;
                                         break blockSearch;
@@ -443,13 +441,22 @@ public class MineSweeperSolver implements Solver {
     }
 
     static int toNumber(Cell cell) {
-        return switch (cell) {
-            case Cell.ExplodedMine ignored -> -3;
-            case Cell.Unknown ignored -> -2;
-            case Cell.MarkedMine ignored -> -1;
-            case Cell.Revealed(var number) -> number;
-            default -> throw new IllegalArgumentException();
+        return switch (cell.type()) {
+            case CellType.Safe(var number) -> number;
+            case CellType.Mine ignored -> -3;
+            case CellType.Unknown ignored -> switch (cell.state()) {
+                case FLAGGED -> -1;
+                case UNKNOWN -> -2;
+                case REVEALED -> throw new IllegalArgumentException();
+            };
         };
+//        return switch (cell) {
+//            case Cell.ExplodedMine ignored -> -3;
+//            case Cell.Unknown ignored -> -2;
+//            case Cell.MarkedMine ignored -> -1;
+//            case Cell.Revealed(var number) -> number;
+//            default -> throw new IllegalArgumentException();
+//        };
     }
     
 }

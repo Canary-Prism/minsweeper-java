@@ -1,5 +1,5 @@
 /*
- *    Copyright 2024 Canary Prism <canaryprsn@gmail.com>
+ *    Copyright 2025 Canary Prism <canaryprsn@gmail.com>
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -16,14 +16,20 @@
 
 package canaryprism.minsweeper;
 
-/// Represents a validated size of board and mine count that u can make a [MinsweeperGame] with
-public record BoardSize(int width, int height, int mines) {
-    public BoardSize {
-        if (width <= 0 || height <= 0)
-            throw new IllegalArgumentException("Invalid Size");
-        if (mines >= width * height)
-            throw new IllegalArgumentException("Too Many Mines");
-        if (mines <= 0)
-            throw new IllegalArgumentException("Too Few Mines");
+public sealed interface CellType {
+    
+    record Safe(int number) implements CellType {
+        public static final Safe EMPTY = new Safe(0);
+    }
+    
+    Mine MINE = Mine.INSTANCE;
+    Unknown UNKNOWN = Unknown.INSTANCE;
+    
+    enum Mine implements CellType {
+        INSTANCE
+    }
+    
+    enum Unknown implements CellType {
+        INSTANCE
     }
 }

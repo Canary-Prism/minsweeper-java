@@ -16,9 +16,7 @@
 
 package canaryprism.minsweeper.solver.impl;
 
-import canaryprism.minsweeper.Cell;
-import canaryprism.minsweeper.GameState;
-import canaryprism.minsweeper.GameStatus;
+import canaryprism.minsweeper.*;
 import canaryprism.minsweeper.solver.Move;
 import canaryprism.minsweeper.solver.Solver;
 
@@ -41,7 +39,8 @@ public class MiaSolver implements Solver {
             for (int y2 = 0; y2 < size.height(); y2++) {
                 for (int x2 = 0; x2 < size.width(); x2++) {
                     
-                    if (!(state.board().get(x2, y2) instanceof Cell.Revealed(var number)))
+                    if (!(state.board().get(x2, y2) instanceof Cell(var t, var ignored)
+                            && t instanceof CellType.Safe(var number)))
                         continue;
                     
                     var marked_mines = 0;
@@ -49,10 +48,10 @@ public class MiaSolver implements Solver {
                     
                     for (int y3 = max(0, y2 - 1); y3 <= min(size.height() - 1, y2 + 1); y3++) {
                         for (int x3 = max(0, x2 - 1); x3 <= min(size.width() - 1, x2 + 1); x3++) {
-                            if (state.board().get(x3, y3) instanceof Cell.MarkedMine) {
+                            if (state.board().get(x3, y3).state() == CellState.FLAGGED) {
                                 marked_mines++;
                                 empty_spaces++;
-                            } else if (state.board().get(x3, y3) instanceof Cell.Unknown) {
+                            } else if (state.board().get(x3, y3).state() == CellState.UNKNOWN) {
                                 empty_spaces++;
                             }
                         }
@@ -64,7 +63,7 @@ public class MiaSolver implements Solver {
                     } else if (number == empty_spaces) {
                         for (int y3 = max(0, y2 - 1); y3 <= min(size.height() - 1, y2 + 1); y3++) {
                             for (int x3 = max(0, x2 - 1); x3 <= min(size.width() - 1, x2 + 1); x3++) {
-                                if (state.board().get(x3, y3) instanceof Cell.Unknown) {
+                                if (state.board().get(x3, y3).state() == CellState.UNKNOWN) {
                                     
                                     return new Move(x3, y3, Move.Click.RIGHT);
                                 }
@@ -73,7 +72,7 @@ public class MiaSolver implements Solver {
                     } else if (number < marked_mines) {
                         for (int y3 = max(0, y2 - 1); y3 <= min(size.height() - 1, y2 + 1); y3++) {
                             for (int x3 = max(0, x2 - 1); x3 <= min(size.width() - 1, x2 + 1); x3++) {
-                                if (state.board().get(x3, y3) instanceof Cell.MarkedMine) {
+                                if (state.board().get(x3, y3).state() == CellState.FLAGGED) {
 
                                     return new Move(x3, y3, Move.Click.RIGHT);
                                 }
@@ -93,7 +92,7 @@ public class MiaSolver implements Solver {
             class Logic {
                 
                 Move logic(int x2, int y2, int de, ArrayList<Point> grid) {
-                    if (!(state.board().get(x2, y2) instanceof Cell.Revealed(var this_num)))
+                    if (!(state.board().get(x2, y2).type() instanceof CellType.Safe(var this_num)))
                         return null;
                     
                     var index = 0;
@@ -126,11 +125,10 @@ public class MiaSolver implements Solver {
                                 index += 1;
                                 continue;
                             }
-                            switch (state.board().get(x3, y3)) {
-                                case Cell.MarkedMine ignored -> flagged++;
-                                case Cell.Unknown ignored -> empty++;
-                                default -> {
-                                }
+                            switch (state.board().get(x3, y3).state()) {
+                                case FLAGGED -> flagged++;
+                                case UNKNOWN -> empty++;
+                                default -> {}
                             }
                             index++;
                         }
@@ -148,7 +146,7 @@ public class MiaSolver implements Solver {
                                     index++;
                                     continue;
                                 }
-                                if (state.board().get(x3, y3) instanceof Cell.Unknown) {
+                                if (state.board().get(x3, y3).state() == CellState.UNKNOWN) {
 //                                        try? await Task.sleep(nanoseconds: 50_000_000)
                                     
                                     return new Move(x3, y3, Move.Click.LEFT);
@@ -168,7 +166,7 @@ public class MiaSolver implements Solver {
                                     index += 1;
                                     continue;
                                 }
-                                if (state.board().get(x3, y3) instanceof Cell.Unknown) {
+                                if (state.board().get(x3, y3).state() == CellState.UNKNOWN) {
                                     return new Move(x3, y3, Move.Click.RIGHT);
                                 }
                                 index += 1;
@@ -184,7 +182,7 @@ public class MiaSolver implements Solver {
             
             for (int y2 = 0; y2 < size.height(); y2++) {
                 for (int x2 = 0; x2 < size.width(); x2++) {
-                    if (state.board().get(x2, y2) instanceof Cell.Revealed(var this_num)) {
+                    if (state.board().get(x2, y2).type() instanceof CellType.Safe(var this_num)) {
                         if (this_num <= 0)
                             continue;
                         
@@ -194,9 +192,9 @@ public class MiaSolver implements Solver {
                         
                         for (int y3 = max(0, y2 - 1); y3 <= min(size.height() - 1, y2 + 1); y3++) {
                             for (int x3 = max(0, x2 - 1); x3 <= min(size.width() - 1, x2 + 1); x3++) {
-                                if (state.board().get(x3, y3) instanceof Cell.MarkedMine) {
+                                if (state.board().get(x3, y3).state() == CellState.FLAGGED) {
                                     flagged += 1;
-                                } else if (state.board().get(x3, y3) instanceof Cell.Unknown) {
+                                } else if (state.board().get(x3, y3).state() == CellState.UNKNOWN) {
                                     grid.add(new Point(x3, y3));
                                     empty += 1;
                                 }
@@ -210,7 +208,7 @@ public class MiaSolver implements Solver {
                         
                         for (int y3 = max(0, y2 - 2); y3 <= min(size.height() - 1, y2 + 2); y3++) {
                             for (int x3 = max(0, x2 - 2); x3 <= min(size.width() - 1, x2 + 2); x3++) {
-                                if (state.board().get(x3, y3) instanceof Cell.Revealed) {
+                                if (state.board().get(x3, y3).state() == CellState.REVEALED) {
                                     if (logic.logic(x3, y3, de, grid) instanceof Move move) {
                                         return move;
                                     }
@@ -227,7 +225,7 @@ public class MiaSolver implements Solver {
         if (state.remainingMines() == 0) {
             for (int y2 = 0; y2 < size.height(); y2++) {
                 for (int x2 = 0; x2 < size.width(); x2++) {
-                    if (state.board().get(x2, y2) instanceof Cell.Unknown) {
+                    if (state.board().get(x2, y2).state() == CellState.UNKNOWN) {
                         
                         return new Move(x2, y2, Move.Click.LEFT);
                     }
@@ -240,10 +238,10 @@ public class MiaSolver implements Solver {
         var adjacents = new HashSet<Move.Point>();
         for (int y = 0; y < size.height(); y++) {
             for (int x = 0; x < size.width(); x++) {
-                if (state.board().get(x, y) instanceof Cell.Unknown) {
+                if (state.board().get(x, y).state() == CellState.UNKNOWN) {
                     for (int y2 = max(0, y - 1); y2 <= min(size.height() - 1, y + 1); y2++) {
                         for (int x2 = max(0, x - 1); x2 <= min(size.width() - 1, x + 1); x2++) {
-                            if (state.board().get(x2, y2) instanceof Cell.Revealed(var number) && number > 0) {
+                            if (state.board().get(x2, y2).type() instanceof CellType.Safe(var number) && number > 0) {
                                 empties.add(new Move.Point(x, y));
                                 adjacents.add(new Move.Point(x2, y2));
                             }
@@ -271,13 +269,13 @@ public class MiaSolver implements Solver {
                     for (var point : empties) {
                         if (states.stream()
                                 .allMatch((e) ->
-                                        e.board().get(point.x(), point.y()) instanceof Cell.Unknown)) {
+                                        e.board().get(point.x(), point.y()).state() == CellState.UNKNOWN)) {
 //                            System.out.println("brute force solution");
                             return new Move(point, Move.Click.LEFT);
                         }
                         if (states.stream()
                                 .allMatch((e) ->
-                                        e.board().get(point.x(), point.y()) instanceof Cell.MarkedMine)) {
+                                        e.board().get(point.x(), point.y()).state() == CellState.FLAGGED)) {
 //                            System.out.println("brute force solution");
                             return new Move(point, Move.Click.RIGHT);
                         }
@@ -302,11 +300,11 @@ public class MiaSolver implements Solver {
         var board = state.board().clone();
         var cell = board.get(x, y);
         var remaining = state.remainingMines();
-        if (cell instanceof Cell.Unknown) {
-            board.set(x, y, Cell.MarkedMine.INSTANCE);
+        if (cell.state() == CellState.UNKNOWN) {
+            board.set(x, y, new Cell(CellType.UNKNOWN, CellState.FLAGGED));
             remaining--;
-        } else if (cell instanceof Cell.MarkedMine) {
-            board.set(x, y, new Cell.Unknown(0));
+        } else if (cell.state() == CellState.FLAGGED) {
+            board.set(x, y, new Cell(CellType.UNKNOWN, CellState.UNKNOWN));
             remaining++;
         }
         return new GameState(state.status(), board, remaining);
@@ -321,12 +319,12 @@ public class MiaSolver implements Solver {
         var x = current.x();
         var y = current.y();
         var flags = 0;
-        var cell = ((Cell.Revealed) state.board().get(x, y));
+        var cell = ((CellType.Safe) state.board().get(x, y).type());
         for (int y3 = max(0, y - 1); y3 <= min(size.height() - 1, y + 1); y3++) {
             for (int x3 = max(0, x - 1); x3 <= min(size.width() - 1, x + 1); x3++) {
-                if (state.board().get(x3, y3) instanceof Cell.Unknown) {
+                if (state.board().get(x3, y3).state() == CellState.UNKNOWN) {
                     empties.add(new Move.Point(x3, y3));
-                } else if (state.board().get(x3, y3) instanceof Cell.MarkedMine) {
+                } else if (state.board().get(x3, y3).state() == CellState.FLAGGED) {
                     flags++;
                 }
             }
