@@ -21,15 +21,16 @@ import canaryprism.minsweeper.solver.impl.MiaSolver;
 import canaryprism.minsweeper.solver.impl.patrickstillhart.MineSweeperSolver;
 
 import java.util.ArrayList;
+import java.util.concurrent.ConcurrentLinkedDeque;
 import java.util.concurrent.ForkJoinPool;
 import java.util.concurrent.ForkJoinTask;
 import java.util.concurrent.atomic.AtomicInteger;
 
-public class Main {
+class Main {
     
     public static void main(String[] args) {
-//        mewo();
-//        System.exit(0);
+        mrrp();
+        System.exit(0);
         System.out.println("mewo");
         var start = System.nanoTime();
         var solver = new MiaSolver();
