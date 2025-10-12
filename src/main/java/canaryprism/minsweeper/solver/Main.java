@@ -64,6 +64,35 @@ public class Main {
         System.out.printf("%10d time elapsed", System.nanoTime() - start);
     }
     
+    private static void mrrp() {
+        System.out.println("mewo");
+        var generator = new MiaSolver();
+        final var total = 200;
+        var size = ConventionalSize.EXPERT.size;
+        var counter = new AtomicInteger();
+        
+        var times = new ConcurrentLinkedDeque<Long>();
+        
+        try (var pool = new ForkJoinPool(ForkJoinPool.getCommonPoolParallelism())) {
+            for (int i = 0; i < total; i++) {
+                var start = System.nanoTime();
+                var game = new MinsweeperGame(size);
+                game.start(generator);
+                game.leftClick(size.width() / 2, size.height() / 2);
+                var elapsed = System.nanoTime() - start;
+                times.add(elapsed);
+                System.out.printf("%4d / %d, %4f\n", counter.incrementAndGet(), total, elapsed / 1_000_000_000.d);
+//                pool.execute(ForkJoinTask.adapt(() -> {
+//                }));
+            }
+        }
+        
+        
+        
+        System.out.printf("%8d total\n", total);
+        System.out.printf("%8.5f average delay", times.stream().mapToLong(Long::intValue).average().orElse(0) / 1_000_000_000);
+    }
+    
     private static void mewo() {
         var solver = new MiaSolver();
         var size = new BoardSize(5, 4, 4);
