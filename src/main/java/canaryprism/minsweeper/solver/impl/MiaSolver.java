@@ -253,7 +253,7 @@ public class MiaSolver implements Solver {
 //        System.out.println();
 //        System.out.println("empties: " + empties.size());
 //        System.out.println("adjacents: " + adjacents.size());
-        if (empties.size() < BRUTE_FORCE_LIMIT) {
+        if (empties.size() < BRUTE_FORCE_LIMIT && !adjacents.isEmpty()) {
 //            System.out.println("brute forcing");
 //            var start = System.nanoTime();
 //            try {
