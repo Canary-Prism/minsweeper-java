@@ -24,6 +24,8 @@ public abstract class AbstractHidingMinsweeper extends AbstractMinsweeper {
     
     @Override
     public final GameState getGameState() {
-        return super.getGameState().hideMines();
+        if (super.getGameState().status() == GameStatus.PLAYING)
+            return super.getGameState().hideMines();
+        return super.getGameState();
     }
 }
