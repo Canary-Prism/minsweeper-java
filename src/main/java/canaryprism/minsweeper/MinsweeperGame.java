@@ -116,8 +116,8 @@ public final class MinsweeperGame extends AbstractRandomMinsweeper {
                 while (true) {
                     var original_state = generateGame();
                     var game = new SetMinsweeperGame(original_state.clone());
-                    var state = game.reveal(x, y);
-                    var result = solver.solve(game, state);
+                    game.reveal(x, y);
+                    var result = solver.solve(game);
                     
                     if (result == Solver.Result.WON) {
                         this.gamestate = original_state;

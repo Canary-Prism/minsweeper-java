@@ -50,7 +50,8 @@ public interface Solver {
     /// @return a move to make
     Move solve(GameState state);
     
-    default Result solve(Minsweeper minsweeper, GameState state) {
+    default Result solve(Minsweeper minsweeper) {
+        var state = minsweeper.getGameState();
         while (state.status() == GameStatus.PLAYING) {
             var move = solve(state);
             if (move instanceof Move(Move.Point(var x, var y), var action))

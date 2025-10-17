@@ -47,7 +47,7 @@ class Main {
                     game.start(generator);
                     var state = game.leftClick(size.width() / 2, size.height() / 2);
                     
-                    var result = solver.solve(game, state);
+                    var result = solver.solve(game);
                     
                     if (result == Solver.Result.WON)
                         successes.incrementAndGet();
