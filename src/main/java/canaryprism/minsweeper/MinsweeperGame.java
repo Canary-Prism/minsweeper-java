@@ -126,4 +126,11 @@ public final class MinsweeperGame extends AbstractRandomMinsweeper {
         
         return super.reveal(x, y);
     }
+    
+    @Override
+    public GameState setFlagged(int x, int y, boolean flagged) {
+        if (first && solver != null)
+            return getGameState();
+        return super.setFlagged(x, y, flagged);
+    }
 }
