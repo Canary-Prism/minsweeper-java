@@ -101,8 +101,8 @@ public abstract class AbstractMinsweeper implements Minsweeper {
     
     @Override
     public GameState reveal(int x, int y) {
-        if (gamestate.status() != GameStatus.PLAYING) return gamestate;
-        if (!(x >= 0 && x < sizes.width() && y >= 0 && y < sizes.height())) return gamestate.hideMines();
+        if (gamestate.status() != GameStatus.PLAYING) return getGameState();
+        if (!(x >= 0 && x < sizes.width() && y >= 0 && y < sizes.height())) return getGameState();
         
         var board = gamestate.board().clone();
         
@@ -115,7 +115,7 @@ public abstract class AbstractMinsweeper implements Minsweeper {
             
             on_lose.run();
             
-            return gamestate;
+            return getGameState();
         }
         
         if (gamestate.board().hasWon()) {
@@ -123,23 +123,23 @@ public abstract class AbstractMinsweeper implements Minsweeper {
             
             on_win.run();
             
-            return gamestate;
+            return getGameState();
         }
         
         
-        return gamestate.hideMines();
+        return getGameState();
     }
     
     @Override
     public GameState clearAround(int x, int y) {
-        if (gamestate.status() != GameStatus.PLAYING) return gamestate;
-        if (!(x >= 0 && x < sizes.width() && y >= 0 && y < sizes.height())) return gamestate.hideMines();
+        if (gamestate.status() != GameStatus.PLAYING) return getGameState();
+        if (!(x >= 0 && x < sizes.width() && y >= 0 && y < sizes.height())) return getGameState();
         
         var board = gamestate.board().clone();
         
         if (!(board.get(x, y) instanceof Cell(var type, var state)
                 && type instanceof CellType.Safe(var number)
-                && state == CellState.REVEALED)) return gamestate.hideMines();
+                && state == CellState.REVEALED)) return getGameState();
         
         var marked_mines = 0;
         
@@ -162,7 +162,7 @@ public abstract class AbstractMinsweeper implements Minsweeper {
             
             on_lose.run();
             
-            return gamestate;
+            return getGameState();
         }
         
         if (gamestate.board().hasWon()) {
@@ -170,19 +170,19 @@ public abstract class AbstractMinsweeper implements Minsweeper {
             
             on_win.run();
             
-            return gamestate;
+            return getGameState();
         }
         
         
-        return gamestate.hideMines();
+        return getGameState();
     }
     
     public GameState setFlagged(int x, int y, boolean flagged) {
-        if (gamestate.status() != GameStatus.PLAYING) return gamestate;
-        if (!(x >= 0 && x < sizes.width() && y >= 0 && y < sizes.height())) return gamestate.hideMines();
+        if (gamestate.status() != GameStatus.PLAYING) return getGameState();
+        if (!(x >= 0 && x < sizes.width() && y >= 0 && y < sizes.height())) return getGameState();
         if (!(gamestate.board().get(x, y) instanceof Cell(var type, var state)
                 && state != CellState.REVEALED))
-            return gamestate.hideMines();
+            return getGameState();
         
         var board = gamestate.board().clone();
         var remaining_mines = gamestate.remainingMines();
@@ -194,6 +194,6 @@ public abstract class AbstractMinsweeper implements Minsweeper {
         
         this.gamestate = gamestate.withBoard(board).withRemainingMines(remaining_mines);
         
-        return gamestate.hideMines();
+        return getGameState();
     }
 }
