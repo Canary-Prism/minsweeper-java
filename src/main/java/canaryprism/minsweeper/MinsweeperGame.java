@@ -59,13 +59,16 @@ public final class MinsweeperGame extends AbstractRandomMinsweeper {
     public GameState reveal(int x, int y) {
         if (gamestate.status() != GameStatus.PLAYING) return gamestate;
         if (!(x >= 0 && x < sizes.width() && y >= 0 && y < sizes.height())) return gamestate.hideMines();
-        if (this.solver != null && this.first) {
+        if (this.first) {
             this.first = false;
+            
+            if (this.solver != null) {
+                this.first = false;
 //            this.gamestate = generateGame(x, y);
-            var solver = this.solver;
+                var solver = this.solver;
 //            var future = new CompletableFuture<GameState>();
-            final var thread_batch = 100;
-            final var loop_batch = 1;
+                final var thread_batch = 100;
+                final var loop_batch = 1;
 //            try (var pool = new ForkJoinPool(ForkJoinPool.getCommonPoolParallelism())) {
 //                solver_loop:
 //                while (true) {
@@ -109,17 +112,30 @@ public final class MinsweeperGame extends AbstractRandomMinsweeper {
 //
 //                }
 //            }
-            
-            while (true) {
-                var original_state = generateGame();
-                var game = new SetMinsweeperGame(original_state.clone());
-                var state = game.reveal(x, y);
-                var result = solver.solve(game, state);
                 
-                if (result == Solver.Result.WON) {
-                    this.gamestate = original_state;
+                while (true) {
+                    var original_state = generateGame();
+                    var game = new SetMinsweeperGame(original_state.clone());
+                    var state = game.reveal(x, y);
+                    var result = solver.solve(game, state);
+                    
+                    if (result == Solver.Result.WON) {
+                        this.gamestate = original_state;
 //                                        this.gamestate = original_state;
-                    break;
+                        break;
+                    }
+                }
+            } else {
+                while (true) {
+                    var original_state = generateGame();
+                    var game = new SetMinsweeperGame(original_state);
+                    var state = game.reveal(x, y);
+                    
+                    if (state.status() == GameStatus.PLAYING) {
+                        this.gamestate = original_state;
+                        
+                        break;
+                    }
                 }
             }
         }
