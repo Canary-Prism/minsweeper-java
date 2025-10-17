@@ -50,15 +50,15 @@ public final class MinsweeperGame extends AbstractRandomMinsweeper {
         
         this.first = true;
         
-        return gamestate.hideMines();
+        return getGameState();
     }
     
     private volatile boolean first;
     
     @Override
     public GameState reveal(int x, int y) {
-        if (gamestate.status() != GameStatus.PLAYING) return gamestate;
-        if (!(x >= 0 && x < sizes.width() && y >= 0 && y < sizes.height())) return gamestate.hideMines();
+        if (gamestate.status() != GameStatus.PLAYING) return getGameState();
+        if (!(x >= 0 && x < sizes.width() && y >= 0 && y < sizes.height())) return getGameState();
         if (this.first) {
             this.first = false;
             

@@ -28,7 +28,7 @@ public abstract class AbstractRandomMinsweeper extends AbstractHidingMinsweeper 
         
         this.gamestate = generateGame();
         
-        return gamestate.hideMines();
+        return getGameState();
     }
     
     private static final Cell MINE = new Cell(CellType.MINE, CellState.UNKNOWN);
