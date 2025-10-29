@@ -20,7 +20,7 @@ import canaryprism.minsweeper.GameState;
 import canaryprism.minsweeper.GameStatus;
 import canaryprism.minsweeper.Minsweeper;
 import canaryprism.minsweeper.MinsweeperGame;
-import canaryprism.minsweeper.solver.impl.MiaSolver;
+import canaryprism.minsweeper.solver.impl.mia.MiaSolver;
 
 /// Solver is a type that is capable of solving [MinsweeperGame] games
 ///
@@ -54,7 +54,7 @@ public interface Solver {
         var state = minsweeper.getGameState();
         while (state.status() == GameStatus.PLAYING) {
             var move = solve(state);
-            if (move instanceof Move(Move.Point(var x, var y), var action))
+            if (move instanceof Move(Move.Point(var x, var y), var action, var ignored))
                 switch (action) {
                     case LEFT -> state = minsweeper.leftClick(x, y);
                     case RIGHT -> state = minsweeper.rightClick(x, y);
@@ -68,6 +68,14 @@ public interface Solver {
             case PLAYING -> Result.RESIGNED;
             case NEVER -> throw new IllegalArgumentException();
         };
+    }
+    
+    default String getName() {
+        return this.getClass().getName();
+    }
+    
+    default String getDescription() {
+        return "no description provided";
     }
     
     enum Result {

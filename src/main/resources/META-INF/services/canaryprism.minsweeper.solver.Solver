@@ -14,5 +14,10 @@
 #    limitations under the License.
 #
 
-canaryprism.minsweeper.solver.impl.MiaSolver
+canaryprism.minsweeper.solver.impl.mia.MiaSolver
+canaryprism.minsweeper.solver.impl.mia.BeginnerSolver
+canaryprism.minsweeper.solver.impl.mia.IntermediateSolver
+canaryprism.minsweeper.solver.impl.mia.ExpertSolver
+canaryprism.minsweeper.solver.impl.mia.IntermediateOnlySolver
+canaryprism.minsweeper.solver.impl.mia.ExpertOnlySolver
 canaryprism.minsweeper.solver.impl.patrickstillhart.MineSweeperSolver

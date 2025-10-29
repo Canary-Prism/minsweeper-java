@@ -14,10 +14,11 @@
  *    limitations under the License.
  */
 
-package canaryprism.minsweeper.solver.impl;
+package canaryprism.minsweeper.solver.impl.mia;
 
 import canaryprism.minsweeper.*;
 import canaryprism.minsweeper.solver.Move;
+import canaryprism.minsweeper.solver.Reason;
 import canaryprism.minsweeper.solver.Solver;
 
 import java.util.*;
@@ -25,10 +26,11 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import static canaryprism.minsweeper.solver.impl.mia.MiaLogic.*;
 import static java.lang.Math.max;
 import static java.lang.Math.min;
 
-public class MiaSolver implements Solver {
+public final class MiaSolver implements Solver {
     
     public static final int BRUTE_FORCE_LIMIT = 20;
     
@@ -43,33 +45,33 @@ public class MiaSolver implements Solver {
                             && t instanceof CellType.Safe(var number)))
                         continue;
                     
-                    var marked_mines = 0;
-                    var empty_spaces = 0;
+                    var marked_mines = new HashSet<Move.Point>();
+                    var empty_spaces = new HashSet<Move.Point>();
                     
                     for (int y3 = max(0, y2 - 1); y3 <= min(size.height() - 1, y2 + 1); y3++) {
                         for (int x3 = max(0, x2 - 1); x3 <= min(size.width() - 1, x2 + 1); x3++) {
                             if (state.board().get(x3, y3).state() == CellState.FLAGGED) {
-                                marked_mines++;
-                                empty_spaces++;
+                                marked_mines.add(new Move.Point(x3, y3));
+                                empty_spaces.add(new Move.Point(x3, y3));
                             } else if (state.board().get(x3, y3).state() == CellState.UNKNOWN) {
-                                empty_spaces++;
+                                empty_spaces.add(new Move.Point(x3, y3));
                             }
                         }
                     }
                     
-                    if (number == marked_mines && empty_spaces > marked_mines) {
+                    if (number == marked_mines.size() && empty_spaces.size() > marked_mines.size()) {
 //                            try? await Task.sleep(nanoseconds: 50_000_000)
-                        return new Move(x2, y2, Move.Click.LEFT);
-                    } else if (number == empty_spaces) {
+                        return new Move(x2, y2, Move.Click.LEFT, new Reason(CHORD, marked_mines));
+                    } else if (number == empty_spaces.size()) {
                         for (int y3 = max(0, y2 - 1); y3 <= min(size.height() - 1, y2 + 1); y3++) {
                             for (int x3 = max(0, x2 - 1); x3 <= min(size.width() - 1, x2 + 1); x3++) {
                                 if (state.board().get(x3, y3).state() == CellState.UNKNOWN) {
-                                    
-                                    return new Move(x3, y3, Move.Click.RIGHT);
+                                    empty_spaces.add(new Move.Point(x2, y2));
+                                    return new Move(x3, y3, Move.Click.RIGHT, new Reason(FLAG_CHORD, empty_spaces));
                                 }
                             }
                         }
-                    } else if (number < marked_mines) {
+                    } else if (number < marked_mines.size()) {
                         for (int y3 = max(0, y2 - 1); y3 <= min(size.height() - 1, y2 + 1); y3++) {
                             for (int x3 = max(0, x2 - 1); x3 <= min(size.width() - 1, x2 + 1); x3++) {
                                 if (state.board().get(x3, y3).state() == CellState.FLAGGED) {
@@ -85,13 +87,10 @@ public class MiaSolver implements Solver {
             }
             
             //logical deduction time :c
-            record Point(int x, int y) {
-            
-            }
             
             class Logic {
                 
-                Move logic(int x2, int y2, int de, ArrayList<Point> grid) {
+                Move logic(int x2, int y2, int de, Set<Move.Point> grid) {
                     if (!(state.board().get(x2, y2).type() instanceof CellType.Safe(var this_num)))
                         return null;
                     
@@ -104,7 +103,7 @@ public class MiaSolver implements Solver {
                                 continue;
                             }
                             for (var item : grid) {
-                                if (item.x == x3 && item.y == y3) {
+                                if (item.x() == x3 && item.y() == y3) {
                                     claimed_surroundings.add(index);
                                 }
                             }
@@ -149,7 +148,7 @@ public class MiaSolver implements Solver {
                                 if (state.board().get(x3, y3).state() == CellState.UNKNOWN) {
 //                                        try? await Task.sleep(nanoseconds: 50_000_000)
                                     
-                                    return new Move(x3, y3, Move.Click.LEFT);
+                                    return new Move(x3, y3, Move.Click.LEFT, new Reason(MULTLI_FLAG_REVEAL, grid));
                                 }
                                 index += 1;
                             }
@@ -167,7 +166,7 @@ public class MiaSolver implements Solver {
                                     continue;
                                 }
                                 if (state.board().get(x3, y3).state() == CellState.UNKNOWN) {
-                                    return new Move(x3, y3, Move.Click.RIGHT);
+                                    return new Move(x3, y3, Move.Click.RIGHT, new Reason(MULTLI_FLAG_FLAG, grid));
                                 }
                                 index += 1;
                             }
@@ -188,14 +187,14 @@ public class MiaSolver implements Solver {
                         
                         var flagged = 0;
                         var empty = 0;
-                        var grid = new ArrayList<Point>();
+                        var grid = new HashSet<Move.Point>();
                         
                         for (int y3 = max(0, y2 - 1); y3 <= min(size.height() - 1, y2 + 1); y3++) {
                             for (int x3 = max(0, x2 - 1); x3 <= min(size.width() - 1, x2 + 1); x3++) {
                                 if (state.board().get(x3, y3).state() == CellState.FLAGGED) {
                                     flagged += 1;
                                 } else if (state.board().get(x3, y3).state() == CellState.UNKNOWN) {
-                                    grid.add(new Point(x3, y3));
+                                    grid.add(new Move.Point(x3, y3));
                                     empty += 1;
                                 }
                             }
@@ -227,7 +226,7 @@ public class MiaSolver implements Solver {
                 for (int x2 = 0; x2 < size.width(); x2++) {
                     if (state.board().get(x2, y2).state() == CellState.UNKNOWN) {
                         
-                        return new Move(x2, y2, Move.Click.LEFT);
+                        return new Move(x2, y2, Move.Click.LEFT, new Reason(ZERO_MINES_REMAINING));
                     }
                 }
             }
@@ -271,13 +270,13 @@ public class MiaSolver implements Solver {
                                 .allMatch((e) ->
                                         e.board().get(point.x(), point.y()).state() == CellState.UNKNOWN)) {
 //                            System.out.println("brute force solution");
-                            return new Move(point, Move.Click.LEFT);
+                            return new Move(point, Move.Click.LEFT, Optional.of(new Reason(BRUTE_FORCE_REVEAL)));
                         }
                         if (states.stream()
                                 .allMatch((e) ->
                                         e.board().get(point.x(), point.y()).state() == CellState.FLAGGED)) {
 //                            System.out.println("brute force solution");
-                            return new Move(point, Move.Click.RIGHT);
+                            return new Move(point, Move.Click.RIGHT, Optional.of(new Reason(BRUTE_FORCE_FLAG)));
                         }
                     }
                 }
@@ -382,5 +381,15 @@ public class MiaSolver implements Solver {
         }
         return stream.build()
                 .flatMap(Function.identity());
+    }
+    
+    @Override
+    public String getName() {
+        return "Mia Solver";
+    }
+    
+    @Override
+    public String getDescription() {
+        return "mia's best attempt at a minesweeper solver";
     }
 }

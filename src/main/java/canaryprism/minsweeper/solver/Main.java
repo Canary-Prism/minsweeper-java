@@ -17,7 +17,7 @@
 package canaryprism.minsweeper.solver;
 
 import canaryprism.minsweeper.*;
-import canaryprism.minsweeper.solver.impl.MiaSolver;
+import canaryprism.minsweeper.solver.impl.mia.MiaSolver;
 import canaryprism.minsweeper.solver.impl.patrickstillhart.MineSweeperSolver;
 
 import java.util.ArrayList;

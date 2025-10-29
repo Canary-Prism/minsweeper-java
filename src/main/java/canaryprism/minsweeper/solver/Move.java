@@ -16,9 +16,17 @@
 
 package canaryprism.minsweeper.solver;
 
-public record Move(Point point, Click action) {
+import java.util.Optional;
+
+public record Move(Point point, Click action, Optional<Reason> reason) {
+    public Move(Point point, Click action) {
+        this(point, action, Optional.empty());
+    }
     public Move(int x, int y, Click action) {
-        this(new Point(x, y), action);
+        this(new Point(x, y), action, Optional.empty());
+    }
+    public Move(int x, int y, Click action, Reason reason) {
+        this(new Point(x, y), action, Optional.of(reason));
     }
     public record Point(int x, int y) {
     

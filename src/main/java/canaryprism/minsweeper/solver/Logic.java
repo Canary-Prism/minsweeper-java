@@ -1,5 +1,5 @@
 /*
- *    Copyright 2024 Canary Prism <canaryprsn@gmail.com>
+ *    Copyright 2025 Canary Prism <canaryprsn@gmail.com>
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -14,19 +14,8 @@
  *    limitations under the License.
  */
 
-import canaryprism.minsweeper.solver.impl.mia.*;
+package canaryprism.minsweeper.solver;
 
-/// Module of Minsweeper
-module canaryprism.minsweeper {
-    exports canaryprism.minsweeper;
-    exports canaryprism.minsweeper.solver;
-    
-    provides canaryprism.minsweeper.solver.Solver with
-            MiaSolver,
-            BeginnerSolver,
-            IntermediateSolver,
-            ExpertSolver,
-            IntermediateOnlySolver,
-            ExpertOnlySolver,
-            canaryprism.minsweeper.solver.impl.patrickstillhart.MineSweeperSolver;
+public interface Logic {
+    String getDescription();
 }
