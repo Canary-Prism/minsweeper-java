@@ -19,7 +19,6 @@ import canaryprism.minsweeper.solver.impl.mia.*;
 /// Module of Minsweeper
 module canaryprism.minsweeper {
     requires static org.jetbrains.annotations;
-    requires canaryprism.minsweeper;
     exports canaryprism.minsweeper;
     exports canaryprism.minsweeper.solver;
     
