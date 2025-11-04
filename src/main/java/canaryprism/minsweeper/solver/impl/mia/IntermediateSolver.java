@@ -86,6 +86,7 @@ public class IntermediateSolver extends BeginnerSolver implements Solver {
                 
                 if (strong_match && flagged + de == this_num && empty > 0) {
                     index = 0;
+                    var clicks = new HashSet<Move.Click>();
                     for (int y3 = max(0, y2 - 1); y3 <= min(size.height() - 1, y2 + 1); y3++) {
                         for (int x3 = max(0, x2 - 1); x3 <= min(size.width() - 1, x2 + 1); x3++) {
                             if (x3 == x2 && y3 == y2) {
@@ -98,14 +99,17 @@ public class IntermediateSolver extends BeginnerSolver implements Solver {
                             }
                             if (state.board().get(x3, y3).state() == CellState.UNKNOWN) {
 //                                        try? await Task.sleep(nanoseconds: 50_000_000)
-                                
-                                return new Move(x3, y3, Move.Click.LEFT, new Reason(MULTLI_FLAG_REVEAL, grid));
+                                clicks.add(new Move.Click(x3, y3, Move.Action.LEFT));
                             }
                             index += 1;
                         }
                     }
+                    if (!clicks.isEmpty()) {
+                        return new Move(clicks, new Reason(MULTLI_FLAG_REVEAL, grid));
+                    }
                 } else if (flagged + de + empty == this_num) {
                     index = 0;
+                    var clicks = new HashSet<Move.Click>();
                     for (int y3 = max(0, y2 - 1); y3 <= min(size.height() - 1, y2 + 1); y3++) {
                         for (int x3 = max(0, x2 - 1); x3 <= min(size.width() - 1, x2 + 1); x3++) {
                             if (x3 == x2 && y3 == y2) {
@@ -117,10 +121,13 @@ public class IntermediateSolver extends BeginnerSolver implements Solver {
                                 continue;
                             }
                             if (state.board().get(x3, y3).state() == CellState.UNKNOWN) {
-                                return new Move(x3, y3, Move.Click.RIGHT, new Reason(MULTLI_FLAG_FLAG, grid));
+                                clicks.add(new Move.Click(x3, y3, Move.Action.RIGHT));
                             }
                             index += 1;
                         }
+                    }
+                    if (!clicks.isEmpty()) {
+                        return new Move(clicks, new Reason(MULTLI_FLAG_FLAG, grid));
                     }
                 }
                 
@@ -170,13 +177,16 @@ public class IntermediateSolver extends BeginnerSolver implements Solver {
         }
         
         if (state.remainingMines() == 0) {
+            var clicks = new HashSet<Move.Click>();
             for (int y2 = 0; y2 < size.height(); y2++) {
                 for (int x2 = 0; x2 < size.width(); x2++) {
                     if (state.board().get(x2, y2).state() == CellState.UNKNOWN) {
-                        
-                        return new Move(x2, y2, Move.Click.LEFT, new Reason(ZERO_MINES_REMAINING));
+                        clicks.add(new Move.Click(x2, y2, Move.Action.LEFT));
                     }
                 }
+            }
+            if (!clicks.isEmpty()) {
+                return new Move(clicks, new Reason(ZERO_MINES_REMAINING));
             }
         }
         

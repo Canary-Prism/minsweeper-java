@@ -29,8 +29,7 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import static canaryprism.minsweeper.solver.impl.mia.MiaLogic.BRUTE_FORCE_FLAG;
-import static canaryprism.minsweeper.solver.impl.mia.MiaLogic.BRUTE_FORCE_REVEAL;
+import static canaryprism.minsweeper.solver.impl.mia.MiaLogic.*;
 import static java.lang.Math.max;
 import static java.lang.Math.min;
 
@@ -43,6 +42,7 @@ public class ExpertSolver extends IntermediateSolver implements Solver {
         if (super.solve(state) instanceof Move move)
             return move;
         var size = state.board().getSize();
+        
         
         var empties = new HashSet<Move.Point>();
         var adjacents = new HashSet<Move.Point>();
@@ -76,19 +76,25 @@ public class ExpertSolver extends IntermediateSolver implements Solver {
 //            System.out.println();
 //        }
             if (!states.isEmpty()) {
+                var clicks = new HashSet<Move.Click>();
                 for (var point : empties) {
                     if (states.stream()
                             .allMatch((e) ->
                                     e.board().get(point.x(), point.y()).state() == CellState.UNKNOWN)) {
 //                            System.out.println("brute force solution");
-                        return new Move(point, Move.Click.LEFT, Optional.of(new Reason(BRUTE_FORCE_REVEAL)));
+                        clicks.add(new Move.Click(point, Move.Action.LEFT));
+//                            return new Move(point, Move.Action.LEFT, Optional.of(new Reason(BRUTE_FORCE_REVEAL)));
                     }
                     if (states.stream()
                             .allMatch((e) ->
                                     e.board().get(point.x(), point.y()).state() == CellState.FLAGGED)) {
 //                            System.out.println("brute force solution");
-                        return new Move(point, Move.Click.RIGHT, Optional.of(new Reason(BRUTE_FORCE_FLAG)));
+                        clicks.add(new Move.Click(point, Move.Action.RIGHT));
+//                            return new Move(point, Move.Action.RIGHT, Optional.of(new Reason(BRUTE_FORCE_FLAG)));
                     }
+                }
+                if (!clicks.isEmpty()) {
+                    return new Move(clicks, new Reason(BRUTE_FORCE, empties));
                 }
             }
 //                System.out.println("brute force without solution");

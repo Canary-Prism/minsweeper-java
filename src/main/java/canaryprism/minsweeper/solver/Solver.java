@@ -21,6 +21,7 @@ import canaryprism.minsweeper.GameStatus;
 import canaryprism.minsweeper.Minsweeper;
 import canaryprism.minsweeper.MinsweeperGame;
 import canaryprism.minsweeper.solver.impl.mia.MiaSolver;
+import org.jetbrains.annotations.Nullable;
 
 /// Solver is a type that is capable of solving [MinsweeperGame] games
 ///
@@ -48,17 +49,18 @@ public interface Solver {
     ///
     /// @param state the state to solve
     /// @return a move to make
-    Move solve(GameState state);
+    @Nullable Move solve(GameState state);
     
     default Result solve(Minsweeper minsweeper) {
         var state = minsweeper.getGameState();
         while (state.status() == GameStatus.PLAYING) {
             var move = solve(state);
-            if (move instanceof Move(Move.Point(var x, var y), var action, var ignored))
-                switch (action) {
-                    case LEFT -> state = minsweeper.leftClick(x, y);
-                    case RIGHT -> state = minsweeper.rightClick(x, y);
-                }
+            if (move instanceof Move(var clicks, var ignored))
+                for (var click : clicks)
+                    switch (click.action()) {
+                        case LEFT -> state = minsweeper.leftClick(click.point().x(), click.point().y());
+                        case RIGHT -> state = minsweeper.rightClick(click.point().x(), click.point().y());
+                    }
             else
                 break;
         }

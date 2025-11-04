@@ -17,21 +17,36 @@
 package canaryprism.minsweeper.solver;
 
 import java.util.Optional;
+import java.util.Set;
 
-public record Move(Point point, Click action, Optional<Reason> reason) {
-    public Move(Point point, Click action) {
-        this(point, action, Optional.empty());
+public record Move(Set<Click> clicks, Optional<Reason> reason) {
+    public Move(Set<Click> clicks, Reason reason) {
+        this(clicks, Optional.of(reason));
     }
-    public Move(int x, int y, Click action) {
-        this(new Point(x, y), action, Optional.empty());
+    public Move(Point point, Action action) {
+        this(Set.of(new Click(point, action)), Optional.empty());
     }
-    public Move(int x, int y, Click action, Reason reason) {
-        this(new Point(x, y), action, Optional.of(reason));
+    public Move(Point point, Action action, Optional<Reason> reason) {
+        this(Set.of(new Click(point, action)), reason);
+    }
+    public Move(Point point, Action action, Reason reason) {
+        this(point, action, Optional.of(reason));
+    }
+    public Move(int x, int y, Action action) {
+        this(Set.of(new Click(x, y, action)), Optional.empty());
+    }
+    public Move(int x, int y, Action action, Reason reason) {
+        this(Set.of(new Click(x, y, action)), Optional.of(reason));
+    }
+    public record Click(Point point, Action action) {
+        public Click(int x, int y, Action action) {
+            this(new Point(x, y), action);
+        }
     }
     public record Point(int x, int y) {
     
     }
-    public enum Click {
+    public enum Action {
         LEFT, RIGHT
     }
 }

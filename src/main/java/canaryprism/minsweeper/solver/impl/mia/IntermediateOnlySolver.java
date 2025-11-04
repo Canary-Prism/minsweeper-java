@@ -36,13 +36,14 @@ public class IntermediateOnlySolver extends IntermediateSolver implements Solver
         var intermediate_logic_used = false;
         while (state.status() == GameStatus.PLAYING) {
             var move = solve(state);
-            if (move instanceof Move(Move.Point(var x, var y), var action, var optional_reason)) {
+            if (move instanceof Move(var clicks, var optional_reason)) {
                 if (optional_reason.orElse(null) instanceof Reason reason && INTERMEDIATE_LOGIC.contains(reason.logic()))
                     intermediate_logic_used = true;
-                switch (action) {
-                    case LEFT -> state = minsweeper.leftClick(x, y);
-                    case RIGHT -> state = minsweeper.rightClick(x, y);
-                }
+                for (var click : clicks)
+                    switch (click.action()) {
+                        case LEFT -> state = minsweeper.leftClick(click.point().x(), click.point().y());
+                        case RIGHT -> state = minsweeper.rightClick(click.point().x(), click.point().y());
+                    }
             } else {
                 break;
             }

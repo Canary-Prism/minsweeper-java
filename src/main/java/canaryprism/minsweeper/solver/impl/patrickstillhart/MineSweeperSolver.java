@@ -81,7 +81,7 @@ public class MineSweeperSolver implements Solver {
                 for (int x3 = max(0, x - 1); x3 <= min(state.board().getSize().width() - 1, x + 1); x3++) {
                     if (state.board().get(x3, y3).state() == CellState.UNKNOWN) {
                         
-                        return new Move(x3, y3, Move.Click.RIGHT);
+                        return new Move(x3, y3, Move.Action.RIGHT);
                     }
                 }
             }
@@ -89,7 +89,7 @@ public class MineSweeperSolver implements Solver {
 
         // Second: open the ones around
         if (number == countAlreadyFlagged) {
-            return new Move(x, y, Move.Click.LEFT);
+            return new Move(x, y, Move.Action.LEFT);
         }
 
         return null;
@@ -282,9 +282,9 @@ public class MineSweeperSolver implements Solver {
                 Point block = segregated.get(currentBlockId).get(i);
 
                 if (allMine)
-                    return new Move(block, Move.Click.RIGHT);
+                    return new Move(block, Move.Action.RIGHT);
                 else if (allEmpty) {
-                    return new Move(block, Move.Click.LEFT);
+                    return new Move(block, Move.Action.LEFT);
                 }
             }
 

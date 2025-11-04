@@ -61,25 +61,30 @@ public final class MiaSolver implements Solver {
                     
                     if (number == marked_mines.size() && empty_spaces.size() > marked_mines.size()) {
 //                            try? await Task.sleep(nanoseconds: 50_000_000)
-                        return new Move(x2, y2, Move.Click.LEFT, new Reason(CHORD, marked_mines));
+                        return new Move(x2, y2, Move.Action.LEFT, new Reason(CHORD, marked_mines));
                     } else if (number == empty_spaces.size()) {
+                        var clicks = new HashSet<Move.Click>();
                         for (int y3 = max(0, y2 - 1); y3 <= min(size.height() - 1, y2 + 1); y3++) {
                             for (int x3 = max(0, x2 - 1); x3 <= min(size.width() - 1, x2 + 1); x3++) {
                                 if (state.board().get(x3, y3).state() == CellState.UNKNOWN) {
                                     empty_spaces.add(new Move.Point(x2, y2));
-                                    return new Move(x3, y3, Move.Click.RIGHT, new Reason(FLAG_CHORD, empty_spaces));
+                                    clicks.add(new Move.Click(x3, y3, Move.Action.RIGHT));
                                 }
                             }
                         }
+                        if (!clicks.isEmpty()) {
+                            return new Move(clicks, new Reason(FLAG_CHORD, empty_spaces));
+                        }
                     } else if (number < marked_mines.size()) {
+                        var clicks = new HashSet<Move.Click>();
                         for (int y3 = max(0, y2 - 1); y3 <= min(size.height() - 1, y2 + 1); y3++) {
                             for (int x3 = max(0, x2 - 1); x3 <= min(size.width() - 1, x2 + 1); x3++) {
                                 if (state.board().get(x3, y3).state() == CellState.FLAGGED) {
-
-                                    return new Move(x3, y3, Move.Click.RIGHT);
+                                    clicks.add(new Move.Click(x3, y3, Move.Action.RIGHT));
                                 }
                             }
                         }
+                        return new Move(clicks, Optional.empty());
                     }
                     
                     
@@ -135,6 +140,7 @@ public final class MiaSolver implements Solver {
                     
                     if (strong_match && flagged + de == this_num && empty > 0) {
                         index = 0;
+                        var clicks = new HashSet<Move.Click>();
                         for (int y3 = max(0, y2 - 1); y3 <= min(size.height() - 1, y2 + 1); y3++) {
                             for (int x3 = max(0, x2 - 1); x3 <= min(size.width() - 1, x2 + 1); x3++) {
                                 if (x3 == x2 && y3 == y2) {
@@ -147,14 +153,17 @@ public final class MiaSolver implements Solver {
                                 }
                                 if (state.board().get(x3, y3).state() == CellState.UNKNOWN) {
 //                                        try? await Task.sleep(nanoseconds: 50_000_000)
-                                    
-                                    return new Move(x3, y3, Move.Click.LEFT, new Reason(MULTLI_FLAG_REVEAL, grid));
+                                    clicks.add(new Move.Click(x3, y3, Move.Action.LEFT));
                                 }
                                 index += 1;
                             }
                         }
+                        if (!clicks.isEmpty()) {
+                            return new Move(clicks, new Reason(MULTLI_FLAG_REVEAL, grid));
+                        }
                     } else if (flagged + de + empty == this_num) {
                         index = 0;
+                        var clicks = new HashSet<Move.Click>();
                         for (int y3 = max(0, y2 - 1); y3 <= min(size.height() - 1, y2 + 1); y3++) {
                             for (int x3 = max(0, x2 - 1); x3 <= min(size.width() - 1, x2 + 1); x3++) {
                                 if (x3 == x2 && y3 == y2) {
@@ -166,10 +175,13 @@ public final class MiaSolver implements Solver {
                                     continue;
                                 }
                                 if (state.board().get(x3, y3).state() == CellState.UNKNOWN) {
-                                    return new Move(x3, y3, Move.Click.RIGHT, new Reason(MULTLI_FLAG_FLAG, grid));
+                                    clicks.add(new Move.Click(x3, y3, Move.Action.RIGHT));
                                 }
                                 index += 1;
                             }
+                        }
+                        if (!clicks.isEmpty()) {
+                            return new Move(clicks, new Reason(MULTLI_FLAG_FLAG, grid));
                         }
                     }
                     
@@ -222,13 +234,16 @@ public final class MiaSolver implements Solver {
         
         
         if (state.remainingMines() == 0) {
+            var clicks = new HashSet<Move.Click>();
             for (int y2 = 0; y2 < size.height(); y2++) {
                 for (int x2 = 0; x2 < size.width(); x2++) {
                     if (state.board().get(x2, y2).state() == CellState.UNKNOWN) {
-                        
-                        return new Move(x2, y2, Move.Click.LEFT, new Reason(ZERO_MINES_REMAINING));
+                        clicks.add(new Move.Click(x2, y2, Move.Action.LEFT));
                     }
                 }
+            }
+            if (!clicks.isEmpty()) {
+                return new Move(clicks, new Reason(ZERO_MINES_REMAINING));
             }
         }
         
@@ -265,27 +280,31 @@ public final class MiaSolver implements Solver {
 //            System.out.println();
 //        }
                 if (!states.isEmpty()) {
+                    var clicks = new HashSet<Move.Click>();
                     for (var point : empties) {
                         if (states.stream()
                                 .allMatch((e) ->
                                         e.board().get(point.x(), point.y()).state() == CellState.UNKNOWN)) {
 //                            System.out.println("brute force solution");
-                            return new Move(point, Move.Click.LEFT, Optional.of(new Reason(BRUTE_FORCE_REVEAL)));
+                            clicks.add(new Move.Click(point, Move.Action.LEFT));
+//                            return new Move(point, Move.Action.LEFT, Optional.of(new Reason(BRUTE_FORCE_REVEAL)));
                         }
                         if (states.stream()
                                 .allMatch((e) ->
                                         e.board().get(point.x(), point.y()).state() == CellState.FLAGGED)) {
 //                            System.out.println("brute force solution");
-                            return new Move(point, Move.Click.RIGHT, Optional.of(new Reason(BRUTE_FORCE_FLAG)));
+                            clicks.add(new Move.Click(point, Move.Action.RIGHT));
+//                            return new Move(point, Move.Action.RIGHT, Optional.of(new Reason(BRUTE_FORCE_FLAG)));
                         }
+                    }
+                    if (!clicks.isEmpty()) {
+                        return new Move(clicks, new Reason(BRUTE_FORCE, empties));
                     }
                 }
 //                System.out.println("brute force without solution");
 //            } finally {
 //                System.out.printf("spent %.6f secs\n", (System.nanoTime() - start) / 1_000_000_000.0);
 //            }
-        } else {
-//            System.out.println("skipping brute force: too many combinations");
         }
         
         

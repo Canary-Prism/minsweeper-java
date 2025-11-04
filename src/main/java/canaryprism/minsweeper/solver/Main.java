@@ -18,7 +18,6 @@ package canaryprism.minsweeper.solver;
 
 import canaryprism.minsweeper.*;
 import canaryprism.minsweeper.solver.impl.mia.MiaSolver;
-import canaryprism.minsweeper.solver.impl.patrickstillhart.MineSweeperSolver;
 
 import java.util.ArrayList;
 import java.util.concurrent.ConcurrentLinkedDeque;
@@ -29,13 +28,13 @@ import java.util.concurrent.atomic.AtomicInteger;
 class Main {
     
     public static void main(String[] args) {
-        mrrp();
-        System.exit(0);
+//        mrrp();
+//        System.exit(0);
         System.out.println("mewo");
         var start = System.nanoTime();
         var solver = new MiaSolver();
-        var generator = new MineSweeperSolver();
-        final var total = 100;
+        var generator = new MiaSolver();
+        final var total = 10000;
         var successes = new AtomicInteger();
         var losses = new AtomicInteger();
         var size = ConventionalSize.EXPERT.size;
@@ -44,7 +43,7 @@ class Main {
             for (int i = 0; i < total; i++) {
                 pool.execute(ForkJoinTask.adapt(() -> {
                     var game = new MinsweeperGame(size);
-                    game.start(generator);
+                    game.start();
                     var state = game.leftClick(size.width() / 2, size.height() / 2);
                     
                     var result = solver.solve(game);

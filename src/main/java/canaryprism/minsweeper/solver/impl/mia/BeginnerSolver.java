@@ -25,6 +25,7 @@ import canaryprism.minsweeper.solver.Reason;
 import canaryprism.minsweeper.solver.Solver;
 
 import java.util.HashSet;
+import java.util.Optional;
 
 import static canaryprism.minsweeper.solver.impl.mia.MiaLogic.CHORD;
 import static canaryprism.minsweeper.solver.impl.mia.MiaLogic.FLAG_CHORD;
@@ -60,25 +61,30 @@ public class BeginnerSolver implements Solver {
                 
                 if (number == marked_mines.size() && empty_spaces.size() > marked_mines.size()) {
 //                            try? await Task.sleep(nanoseconds: 50_000_000)
-                    return new Move(x2, y2, Move.Click.LEFT, new Reason(CHORD, marked_mines));
+                    return new Move(x2, y2, Move.Action.LEFT, new Reason(CHORD, marked_mines));
                 } else if (number == empty_spaces.size()) {
+                    var clicks = new HashSet<Move.Click>();
                     for (int y3 = max(0, y2 - 1); y3 <= min(size.height() - 1, y2 + 1); y3++) {
                         for (int x3 = max(0, x2 - 1); x3 <= min(size.width() - 1, x2 + 1); x3++) {
                             if (state.board().get(x3, y3).state() == CellState.UNKNOWN) {
                                 empty_spaces.add(new Move.Point(x2, y2));
-                                return new Move(x3, y3, Move.Click.RIGHT, new Reason(FLAG_CHORD, empty_spaces));
+                                clicks.add(new Move.Click(x3, y3, Move.Action.RIGHT));
                             }
                         }
                     }
+                    if (!clicks.isEmpty()) {
+                        return new Move(clicks, new Reason(FLAG_CHORD, empty_spaces));
+                    }
                 } else if (number < marked_mines.size()) {
+                    var clicks = new HashSet<Move.Click>();
                     for (int y3 = max(0, y2 - 1); y3 <= min(size.height() - 1, y2 + 1); y3++) {
                         for (int x3 = max(0, x2 - 1); x3 <= min(size.width() - 1, x2 + 1); x3++) {
                             if (state.board().get(x3, y3).state() == CellState.FLAGGED) {
-                                
-                                return new Move(x3, y3, Move.Click.RIGHT);
+                                clicks.add(new Move.Click(x3, y3, Move.Action.RIGHT));
                             }
                         }
                     }
+                    return new Move(clicks, Optional.empty());
                 }
                 
                 
