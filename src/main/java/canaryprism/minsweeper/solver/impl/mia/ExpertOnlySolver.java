@@ -28,7 +28,7 @@ import java.util.Set;
 public class ExpertOnlySolver extends ExpertSolver implements Solver {
     
     public static final Set<Logic> EXPERT_LOGIC = Set.of(
-            MiaLogic.BRUTE_FORCE_FLAG, MiaLogic.BRUTE_FORCE_REVEAL);
+            MiaLogic.BRUTE_FORCE);
     
     @Override
     public Result solve(Minsweeper minsweeper) {
