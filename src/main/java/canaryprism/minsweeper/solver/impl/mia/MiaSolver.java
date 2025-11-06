@@ -300,6 +300,24 @@ public final class MiaSolver implements Solver {
                     if (!clicks.isEmpty()) {
                         return new Move(clicks, new Reason(BRUTE_FORCE, empties));
                     }
+                    
+                    if (states.stream().allMatch((e) -> e.remainingMines() == 0)) {
+                        for (int y2 = 0; y2 < size.height(); y2++) {
+                            for (int x2 = 0; x2 < size.width(); x2++) {
+                                int x = x2, y = y2;
+                                if (state.board().get(x2, y2).state() == CellState.UNKNOWN
+                                        && states.stream()
+                                        .allMatch((e) ->
+                                                e.board().get(x, y).state() != CellState.FLAGGED)) {
+                                    clicks.add(new Move.Click(x2, y2, Move.Action.LEFT));
+                                }
+                            }
+                        }
+                    }
+                    
+                    if (!clicks.isEmpty()) {
+                        return new Move(clicks, new Reason(BRUTE_FORCE_EXHAUSTION, empties));
+                    }
                 }
 //                System.out.println("brute force without solution");
 //            } finally {

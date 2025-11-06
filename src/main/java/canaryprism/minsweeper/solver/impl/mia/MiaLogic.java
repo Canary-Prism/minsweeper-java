@@ -25,6 +25,7 @@ public enum MiaLogic implements Logic {
     MULTLI_FLAG_FLAG("the surrounding cells force the cells to be a mine"),
     ZERO_MINES_REMAINING("0 mines remaining, all unknown cells must be safe"),
     BRUTE_FORCE("in every possible mine configuration the cells are safe/mines"),
+    BRUTE_FORCE_EXHAUSTION("in every possible mine configuration every mine is determined, all unused cells must be safe"),
     ;
     
     public final String description;
