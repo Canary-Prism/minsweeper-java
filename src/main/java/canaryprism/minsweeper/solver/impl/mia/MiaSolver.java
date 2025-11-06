@@ -32,7 +32,7 @@ import static java.lang.Math.min;
 
 public final class MiaSolver implements Solver {
     
-    public static final int BRUTE_FORCE_LIMIT = 20;
+    public static final int BRUTE_FORCE_LIMIT = 30;
     
     public Move solve(GameState state) {
         var size = state.board().getSize();
