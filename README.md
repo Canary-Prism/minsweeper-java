@@ -21,4 +21,4 @@ Solver is a SPI that has methods for solving a particular state or solving an en
 the library comes with a couple default solvers that have different skill levels
 in order to generate boards with specific a specific "difficulty"
 
-Solvers with "Only" in their names will not accept 
+Solvers with "Only" in their names will not accept games that are solvable by the previous level of solver
