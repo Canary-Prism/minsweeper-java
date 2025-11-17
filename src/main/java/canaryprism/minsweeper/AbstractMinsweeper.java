@@ -16,6 +16,8 @@
 
 package canaryprism.minsweeper;
 
+import java.util.HashSet;
+
 public abstract class AbstractMinsweeper implements Minsweeper {
     
     protected final BoardSize sizes;
@@ -45,18 +47,35 @@ public abstract class AbstractMinsweeper implements Minsweeper {
                 && s == CellState.UNKNOWN))
             return;
         
-        board.set(x, y, new Cell(CellType.Safe.EMPTY, CellState.REVEALED));
+        var empty_cell = new Cell(CellType.Safe.EMPTY, CellState.REVEALED);
+        board.set(x, y, empty_cell);
         
-        for (int y2 = Math.max(0, y - 1); y2 <= Math.min(sizes.height() - 1, y + 1); y2++)
-            for (int x2 = Math.max(0, x - 1); x2 <= Math.min(sizes.width() - 1, x + 1); x2++)
-                if (board.get(x2, y2) instanceof Cell(var type, var state)
-                        && type instanceof CellType.Safe(var number)
-                        && state == CellState.UNKNOWN)
-                    if (number == 0) {
-                        revealEmpty(x2, y2, board);
-                    } else {
-                        board.set(x2, y2, new Cell(new CellType.Safe(number), CellState.REVEALED));
+        record Point(int x, int y) {}
+        var flood = new HashSet<Point>();
+        
+        flood.add(new Point(x, y));
+        
+        while (!flood.isEmpty()) {
+            
+            var point = flood.iterator().next();
+            flood.remove(point);
+            var x2 = point.x;
+            
+            var y2 = point.y;
+            
+            for (int y3 = Math.max(0, y2 - 1); y3 <= Math.min(sizes.height() - 1, y2 + 1); y3++)
+                for (int x3 = Math.max(0, x2 - 1); x3 <= Math.min(sizes.width() - 1, x2 + 1); x3++)
+                    if (board.get(x3, y3) instanceof Cell(var type, var state)
+                            && type instanceof CellType.Safe(var number)
+                            && state == CellState.UNKNOWN) {
+                        board.set(x3, y3, new Cell(new CellType.Safe(number), CellState.REVEALED));
+                        if (number == 0) {
+//                                revealEmpty(x2, y2, board);
+                            flood.add(new Point(x3, y3));
+                        }
                     }
+        }
+        
     }
     
     private boolean internalReveal(int x, int y, Board board) {
