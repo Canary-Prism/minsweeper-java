@@ -22,7 +22,7 @@ plugins {
 
 group = "io.github.canary-prism"
 description = "Minesweeper backend thing for Java"
-version = "5.1.1"
+version = "5.1.2"
 
 repositories {
     mavenCentral()
