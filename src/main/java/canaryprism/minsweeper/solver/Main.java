@@ -17,6 +17,7 @@
 package canaryprism.minsweeper.solver;
 
 import canaryprism.minsweeper.*;
+import canaryprism.minsweeper.solver.impl.mia.IntermediateOnlySolver;
 import canaryprism.minsweeper.solver.impl.mia.MiaSolver;
 
 import java.util.ArrayList;
@@ -33,8 +34,8 @@ class Main {
         System.out.println("mewo");
         var start = System.nanoTime();
         var solver = new MiaSolver();
-        var generator = new MiaSolver();
-        final var total = 10000;
+        var generator = new IntermediateOnlySolver();
+        final var total = 1000;
         var successes = new AtomicInteger();
         var losses = new AtomicInteger();
         var size = ConventionalSize.EXPERT.size;
@@ -43,8 +44,8 @@ class Main {
             for (int i = 0; i < total; i++) {
                 pool.execute(ForkJoinTask.adapt(() -> {
                     var game = new MinsweeperGame(size);
-                    game.start();
-                    var state = game.leftClick(size.width() / 2, size.height() / 2);
+                    game.start(generator);
+                    game.leftClick(size.width() / 2, size.height() / 2);
                     
                     var result = solver.solve(game);
                     
