@@ -93,141 +93,119 @@ public final class MiaSolver implements Solver {
             
             //logical deduction time :c
             
-            class Logic {
-                
-                Move logic(int x2, int y2, int de, Set<Move.Point> grid) {
-                    if (!(state.board().get(x2, y2).type() instanceof CellType.Safe(var this_num)))
-                        return null;
-                    
-                    var index = 0;
-                    var claimed_surroundings = new ArrayList<Integer>();
-                    for (int y3 = max(0, y2 - 1); y3 <= min(size.height() - 1, y2 + 1); y3++) {
-                        for (int x3 = max(0, x2 - 1); x3 <= min(size.width() - 1, x2 + 1); x3++) {
-                            if (x3 == x2 && y3 == y2) {
-                                index += 1;
-                                continue;
-                            }
-                            for (var item : grid) {
-                                if (item.x() == x3 && item.y() == y3) {
-                                    claimed_surroundings.add(index);
-                                }
-                            }
-                            index += 1;
-                        }
-                    }
-                    var strong_match = claimed_surroundings.size() == grid.size();
-                    var flagged = 0;
-                    var empty = 0;
-                    index = 0;
-                    for (int y3 = max(0, y2 - 1); y3 <= min(size.height() - 1, y2 + 1); y3++) {
-                        for (int x3 = max(0, x2 - 1); x3 <= min(size.width() - 1, x2 + 1); x3++) {
-                            if (x3 == x2 && y3 == y2) {
-                                index += 1;
-                                continue;
-                            }
-                            if (claimed_surroundings.contains(index)) {
-                                index += 1;
-                                continue;
-                            }
-                            switch (state.board().get(x3, y3).state()) {
-                                case FLAGGED -> flagged++;
-                                case UNKNOWN -> empty++;
-                                default -> {}
-                            }
-                            index++;
-                        }
-                    }
-                    
-                    if (strong_match && flagged + de == this_num && empty > 0) {
-                        index = 0;
-                        var clicks = new HashSet<Move.Click>();
-                        for (int y3 = max(0, y2 - 1); y3 <= min(size.height() - 1, y2 + 1); y3++) {
-                            for (int x3 = max(0, x2 - 1); x3 <= min(size.width() - 1, x2 + 1); x3++) {
-                                if (x3 == x2 && y3 == y2) {
-                                    index++;
-                                    continue;
-                                }
-                                if (claimed_surroundings.contains(index)) {
-                                    index++;
-                                    continue;
-                                }
-                                if (state.board().get(x3, y3).state() == CellState.UNKNOWN) {
-//                                        try? await Task.sleep(nanoseconds: 50_000_000)
-                                    clicks.add(new Move.Click(x3, y3, Move.Action.LEFT));
-                                }
-                                index += 1;
-                            }
-                        }
-                        if (!clicks.isEmpty()) {
-                            return new Move(clicks, new Reason(MULTLI_FLAG_REVEAL, grid));
-                        }
-                    } else if (flagged + de + empty == this_num) {
-                        index = 0;
-                        var clicks = new HashSet<Move.Click>();
-                        for (int y3 = max(0, y2 - 1); y3 <= min(size.height() - 1, y2 + 1); y3++) {
-                            for (int x3 = max(0, x2 - 1); x3 <= min(size.width() - 1, x2 + 1); x3++) {
-                                if (x3 == x2 && y3 == y2) {
-                                    index += 1;
-                                    continue;
-                                }
-                                if (claimed_surroundings.contains(index)) {
-                                    index += 1;
-                                    continue;
-                                }
-                                if (state.board().get(x3, y3).state() == CellState.UNKNOWN) {
-                                    clicks.add(new Move.Click(x3, y3, Move.Action.RIGHT));
-                                }
-                                index += 1;
-                            }
-                        }
-                        if (!clicks.isEmpty()) {
-                            return new Move(clicks, new Reason(MULTLI_FLAG_FLAG, grid));
-                        }
-                    }
-                    
-                    return null;
-                }
-            }
+//            new way of doing multi flags
+//            should be better
+//            you have to generate all the multi flags first,,
             
-            var logic = new Logic();
+            record Flag(int number, HashSet<Move.Point> points) {}
+            
+            var flags = new LinkedHashSet<Flag>();
+            // woah really hate i was too lazy to not use a lambda
+            // aren't they like inefficient or something
             
             for (int y2 = 0; y2 < size.height(); y2++) {
                 for (int x2 = 0; x2 < size.width(); x2++) {
-                    if (state.board().get(x2, y2).type() instanceof CellType.Safe(var this_num)) {
-                        if (this_num <= 0)
-                            continue;
-                        
-                        var flagged = 0;
-                        var empty = 0;
-                        var grid = new HashSet<Move.Point>();
+                    if (state.board().get(x2, y2).type() instanceof CellType.Safe(var required)) {
                         
                         for (int y3 = max(0, y2 - 1); y3 <= min(size.height() - 1, y2 + 1); y3++) {
                             for (int x3 = max(0, x2 - 1); x3 <= min(size.width() - 1, x2 + 1); x3++) {
                                 if (state.board().get(x3, y3).state() == CellState.FLAGGED) {
-                                    flagged += 1;
-                                } else if (state.board().get(x3, y3).state() == CellState.UNKNOWN) {
-                                    grid.add(new Move.Point(x3, y3));
-                                    empty += 1;
+                                    required--;
                                 }
                             }
                         }
-                        if (!(flagged < this_num && empty > 0))
+                        
+                        if (required <= 0)
                             continue;
                         
-                        final var de = this_num - flagged;
-                        
-                        
-                        for (int y3 = max(0, y2 - 2); y3 <= min(size.height() - 1, y2 + 2); y3++) {
-                            for (int x3 = max(0, x2 - 2); x3 <= min(size.width() - 1, x2 + 2); x3++) {
-                                if (state.board().get(x3, y3).state() == CellState.REVEALED) {
-                                    if (logic.logic(x3, y3, de, grid) instanceof Move move) {
-                                        return move;
-                                    }
+                        var neighbours = new HashSet<Move.Point>();
+                        for (int y3 = max(0, y2 - 1); y3 <= min(size.height() - 1, y2 + 1); y3++) {
+                            for (int x3 = max(0, x2 - 1); x3 <= min(size.width() - 1, x2 + 1); x3++) {
+                                if (state.board().get(x3, y3).state() == CellState.UNKNOWN) {
+                                    neighbours.add(new Move.Point(x3, y3));
                                 }
+                            }
+                        }
+                        
+                        if (neighbours.isEmpty())
+                            continue;
+                        
+                        flags.add(new Flag(required, neighbours));
+                    }
+                }
+            }
+            
+            var changed = true;
+            while (changed) {
+                
+                var to_add = new HashSet<Flag>();
+                for (var flag : flags) {
+                    // entirely contained flags and stuff
+                    {
+                        var contained_flags = flags.stream()
+                                .filter((e) -> flag.points.containsAll(e.points))
+                                .collect(Collectors.toSet());
+                        
+                        for (var contained : contained_flags) {
+                            var remaining_number = flag.number - contained.number;
+                            var remaining_neighbours = new HashSet<>(flag.points);
+                            remaining_neighbours.removeAll(contained.points);
+                            
+                            if (remaining_neighbours.isEmpty())
+                                continue;
+                            
+                            
+                            if (remaining_number == 0) {
+                                // all the flags are accounted for, just reveal everything remaining
+                                return new Move(
+                                        remaining_neighbours.stream()
+                                                .map((point) -> new Move.Click(point, Move.Action.LEFT))
+                                                .collect(Collectors.toSet()),
+                                        new Reason(MULTLI_FLAG_REVEAL, contained.points));
+                            } else if (remaining_number == remaining_neighbours.size()) {
+                                // all flags can be accounted for if everything left is flagged yippee
+                                return new Move(
+                                        remaining_neighbours.stream()
+                                                .map((point) -> new Move.Click(point, Move.Action.RIGHT))
+                                                .collect(Collectors.toSet()),
+                                        new Reason(MULTLI_FLAG_FLAG, contained.points));
+                            }
+//                            it.remove();
+//                            to_add.add(flag);
+                            to_add.add(new Flag(remaining_number, remaining_neighbours));
+                        }
+                    }
+                    
+                    // not entirely contained stuffs
+                    {
+                        var touching_flags = flags.stream()
+                                .filter((e) -> e.points.stream()
+                                        .anyMatch(flag.points::contains))
+                                .collect(Collectors.toSet());
+                        
+                        
+                        for (var touching : touching_flags) {
+                            var remaining_number = flag.number - touching.number;
+                            var remaining_neighbours = new HashSet<>(flag.points);
+                            remaining_neighbours.removeAll(touching.points);
+                            
+                            if (remaining_neighbours.isEmpty())
+                                continue;
+                            
+                            
+                            if (remaining_number == remaining_neighbours.size()) {
+                                // all flags can be accounted for if everything left is flagged yippee
+                                return new Move(
+                                        remaining_neighbours.stream()
+                                                .map((point) -> new Move.Click(point, Move.Action.RIGHT))
+                                                .collect(Collectors.toSet()),
+                                        new Reason(MULTLI_FLAG_FLAG, touching.points));
                             }
                         }
                     }
                 }
+                
+                changed = flags.addAll(to_add);
             }
             
         }
