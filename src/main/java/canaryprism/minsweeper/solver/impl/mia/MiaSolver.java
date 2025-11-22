@@ -30,7 +30,7 @@ import static canaryprism.minsweeper.solver.impl.mia.MiaLogic.*;
 import static java.lang.Math.max;
 import static java.lang.Math.min;
 
-public final class MiaSolver implements Solver {
+public class MiaSolver implements Solver {
     
     public static final int BRUTE_FORCE_LIMIT = 30;
     
@@ -161,14 +161,14 @@ public final class MiaSolver implements Solver {
                                         remaining_neighbours.stream()
                                                 .map((point) -> new Move.Click(point, Move.Action.LEFT))
                                                 .collect(Collectors.toSet()),
-                                        new Reason(MULTLI_FLAG_REVEAL, contained.points));
+                                        new Reason(REGION_DEDUCTION_REVEAL, contained.points));
                             } else if (remaining_number == remaining_neighbours.size()) {
                                 // all flags can be accounted for if everything left is flagged yippee
                                 return new Move(
                                         remaining_neighbours.stream()
                                                 .map((point) -> new Move.Click(point, Move.Action.RIGHT))
                                                 .collect(Collectors.toSet()),
-                                        new Reason(MULTLI_FLAG_FLAG, contained.points));
+                                        new Reason(REGION_DEDUCTION_FLAG, contained.points));
                             }
 //                            it.remove();
 //                            to_add.add(flag);
@@ -199,7 +199,7 @@ public final class MiaSolver implements Solver {
                                         remaining_neighbours.stream()
                                                 .map((point) -> new Move.Click(point, Move.Action.RIGHT))
                                                 .collect(Collectors.toSet()),
-                                        new Reason(MULTLI_FLAG_FLAG, touching.points));
+                                        new Reason(REGION_DEDUCTION_FLAG, touching.points));
                             }
                         }
                     }

@@ -21,8 +21,10 @@ import canaryprism.minsweeper.solver.Logic;
 public enum MiaLogic implements Logic {
     CHORD("the amount of flags around the cell matches its number"),
     FLAG_CHORD("the amount of flaggable cells around the cell matches its number"),
-    MULTLI_FLAG_REVEAL("the surrounding cells force the cells to be safe"),
-    MULTLI_FLAG_FLAG("the surrounding cells force the cells to be a mine"),
+    MULTLI_FLAG_REVEAL("a neighbour cell force the cells to be safe"),
+    MULTLI_FLAG_FLAG("a neighbour cell force the cells to be a mine"),
+    REGION_DEDUCTION_REVEAL("the surrounding cells force the cells to be safe"),
+    REGION_DEDUCTION_FLAG("the surrounding cells force the cells to be a mine"),
     ZERO_MINES_REMAINING("0 mines remaining, all unknown cells must be safe"),
     BRUTE_FORCE("in every possible mine configuration the cells are safe/mines"),
     BRUTE_FORCE_EXHAUSTION("in every possible mine configuration every mine is determined, all unused cells must be safe"),
