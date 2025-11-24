@@ -28,7 +28,7 @@ import java.util.Set;
 public class IntermediateOnlySolver extends IntermediateSolver implements Solver {
     
     public static final Set<Logic> INTERMEDIATE_LOGIC = Set.of(
-            MiaLogic.MULTLI_FLAG_REVEAL, MiaLogic.MULTLI_FLAG_FLAG, MiaLogic.ZERO_MINES_REMAINING);
+            MiaLogic.REGION_DEDUCTION_REVEAL, MiaLogic.REGION_DEDUCTION_FLAG, MiaLogic.ZERO_MINES_REMAINING);
     
     @Override
     public Result solve(Minsweeper minsweeper) {

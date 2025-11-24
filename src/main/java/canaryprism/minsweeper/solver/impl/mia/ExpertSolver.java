@@ -80,7 +80,7 @@ public class ExpertSolver extends IntermediateSolver implements Solver {
                 for (var point : empties) {
                     if (states.stream()
                             .allMatch((e) ->
-                                    e.board().get(point.x(), point.y()).state() == CellState.UNKNOWN)) {
+                                    e.board().get(point.x(), point.y()).state() != CellState.FLAGGED)) {
 //                            System.out.println("brute force solution");
                         clicks.add(new Move.Click(point, Move.Action.LEFT));
 //                            return new Move(point, Move.Action.LEFT, Optional.of(new Reason(BRUTE_FORCE_REVEAL)));
@@ -95,6 +95,24 @@ public class ExpertSolver extends IntermediateSolver implements Solver {
                 }
                 if (!clicks.isEmpty()) {
                     return new Move(clicks, new Reason(BRUTE_FORCE, empties));
+                }
+                
+                if (states.stream().allMatch((e) -> e.remainingMines() == 0)) {
+                    for (int y2 = 0; y2 < size.height(); y2++) {
+                        for (int x2 = 0; x2 < size.width(); x2++) {
+                            int x = x2, y = y2;
+                            if (state.board().get(x2, y2).state() == CellState.UNKNOWN
+                                    && states.stream()
+                                    .allMatch((e) ->
+                                            e.board().get(x, y).state() != CellState.FLAGGED)) {
+                                clicks.add(new Move.Click(x2, y2, Move.Action.LEFT));
+                            }
+                        }
+                    }
+                }
+                
+                if (!clicks.isEmpty()) {
+                    return new Move(clicks, new Reason(BRUTE_FORCE_EXHAUSTION, empties));
                 }
             }
 //                System.out.println("brute force without solution");
@@ -125,6 +143,17 @@ public class ExpertSolver extends IntermediateSolver implements Solver {
         return new GameState(state.status(), board, remaining);
     }
     
+    private GameState simulateReveal(GameState state, Move.Point point) {
+        return simulateReveal(state, point.x(), point.y());
+    }
+    private GameState simulateReveal(GameState state, int x, int y) {
+        var board = state.board().clone();
+        // it is normally illegal to have a revealed cell still be unknown
+        // but such are the circumstances we find ourselves in
+        board.set(x, y, new Cell(CellType.UNKNOWN, CellState.REVEALED));
+        return new GameState(state.status(), board, state.remainingMines());
+    }
+    
     /// this might actually return partially filled satisfied states since tehy might fail early??
     /// probably not though
     private Stream<GameState> bruteForce(List<Move.Point> points, int index, GameState state) {
@@ -146,21 +175,31 @@ public class ExpertSolver extends IntermediateSolver implements Solver {
         }
         
         var mines_to_flag = cell.number() - flags;
+        
+        if (mines_to_flag > state.remainingMines() || mines_to_flag > empties.size())
+            return Stream.empty(); // invalid
+        
         if (mines_to_flag == 0 || empties.isEmpty()) {
-            if (index + 1 == points.size())
+            if (index + 1 == points.size()) {
                 return Stream.of(state);
+            }
             return bruteForce(points, index + 1, state);
         }
         
-        if (mines_to_flag > state.remainingMines())
-            return Stream.empty(); // invalid
         
         var stream = Stream.<Stream<GameState>>builder();
         for (var flag_combination : getFlagCombinations(empties, mines_to_flag)) {
             var state_copy = state.clone();
-            for (var point : flag_combination) {
-                state_copy = simulateRightClick(state_copy, point);
+            for (var point : empties) {
+                if (flag_combination.contains(point)) {
+                    state_copy = simulateRightClick(state_copy, point);
+                } else {
+                    state_copy = simulateReveal(state_copy, point);
+                }
             }
+//            for (var point : flag_combination) {
+//                state_copy = simulateRightClick(state_copy, point);
+//            }
             if (index + 1 == points.size()) {
                 stream.add(Stream.of(state_copy));
             } else {
