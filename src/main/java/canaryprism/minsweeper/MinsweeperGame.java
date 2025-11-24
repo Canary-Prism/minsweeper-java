@@ -128,19 +128,7 @@ public final class MinsweeperGame extends AbstractRandomMinsweeper {
                     }
                 }
             } else {
-                while (true) {
-                    if (Thread.interrupted())
-                        throw new GenerationInterruptedException(new InterruptedException());
-                    var original_state = generateGame();
-                    var game = new SetMinsweeperGame(original_state);
-                    var state = game.reveal(x, y);
-                    
-                    if (state.status() == GameStatus.PLAYING) {
-                        this.gamestate = original_state;
-                        
-                        break;
-                    }
-                }
+                this.gamestate = generateGame();
             }
         }
         
