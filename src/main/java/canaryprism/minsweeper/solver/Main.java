@@ -17,8 +17,8 @@
 package canaryprism.minsweeper.solver;
 
 import canaryprism.minsweeper.*;
-import canaryprism.minsweeper.solver.impl.mia.IntermediateOnlySolver;
 import canaryprism.minsweeper.solver.impl.mia.MiaSolver;
+import canaryprism.minsweeper.solver.impl.start.ZeroStart;
 
 import java.util.ArrayList;
 import java.util.concurrent.ConcurrentLinkedDeque;
@@ -34,7 +34,7 @@ class Main {
         System.out.println("mewo");
         var start = System.nanoTime();
         var solver = new MiaSolver();
-        var generator = new IntermediateOnlySolver();
+        var generator = new ZeroStart();
         final var total = 1000;
         var successes = new AtomicInteger();
         var losses = new AtomicInteger();
