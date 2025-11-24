@@ -44,7 +44,7 @@ public abstract class AbstractMinsweeper implements Minsweeper {
     private void revealEmpty(int x, int y, Board board) {
         if (!(board.get(x, y) instanceof Cell(var t, var s)
                 && t instanceof CellType.Safe(int n) && n == 0
-                && s == CellState.UNKNOWN))
+                && s != CellState.REVEALED))
             return;
         
         var empty_cell = new Cell(CellType.Safe.EMPTY, CellState.REVEALED);
@@ -67,7 +67,7 @@ public abstract class AbstractMinsweeper implements Minsweeper {
                 for (int x3 = Math.max(0, x2 - 1); x3 <= Math.min(sizes.width() - 1, x2 + 1); x3++)
                     if (board.get(x3, y3) instanceof Cell(var type, var state)
                             && type instanceof CellType.Safe(var number)
-                            && state == CellState.UNKNOWN) {
+                            && state != CellState.REVEALED) {
                         board.set(x3, y3, new Cell(new CellType.Safe(number), CellState.REVEALED));
                         if (number == 0) {
 //                                revealEmpty(x2, y2, board);
