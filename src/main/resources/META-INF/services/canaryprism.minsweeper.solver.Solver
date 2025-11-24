@@ -14,6 +14,8 @@
 #    limitations under the License.
 #
 
+canaryprism.minsweeper.solver.impl.start.SafeStart
+canaryprism.minsweeper.solver.impl.start.ZeroStart
 canaryprism.minsweeper.solver.impl.mia.MiaSolver
 canaryprism.minsweeper.solver.impl.mia.BeginnerSolver
 canaryprism.minsweeper.solver.impl.mia.IntermediateSolver

@@ -15,6 +15,7 @@
  */
 
 import canaryprism.minsweeper.solver.impl.mia.*;
+import canaryprism.minsweeper.solver.impl.start.*;
 
 /// Module of Minsweeper
 module canaryprism.minsweeper {
@@ -23,6 +24,8 @@ module canaryprism.minsweeper {
     exports canaryprism.minsweeper.solver;
     
     provides canaryprism.minsweeper.solver.Solver with
+            SafeStart,
+            ZeroStart,
             MiaSolver,
             BeginnerSolver,
             IntermediateSolver,
