@@ -16,6 +16,24 @@
 
 package canaryprism.minsweeper;
 
+/// Represents a [Cell]'s state
+///
+/// A cell's state is the current perceived state it is in by the player.
+/// A cell can either be [#UNKNOWN], [#REVEALED] or [#FLAGGED]
 public enum CellState {
-    UNKNOWN, REVEALED, FLAGGED
+    
+    /// An unknown cell state is a cell that the player hasn't revealed yet and doesn't have flagged
+    ///
+    /// [Minsweeper] implementations may choose to hide the Cell's [CellType] too by making it [CellType.Unknown]
+    UNKNOWN,
+    
+    /// A revealed cell state is a cell that the player has revealed
+    ///
+    /// if a [CellType.Mine] cell has been revealed then the game is lost
+    REVEALED,
+    
+    /// A flagged cell state is a cell that the player hasn't revealed yet and has flagged
+    ///
+    /// [Minsweeper] implementations may choose to hide the Cell's [CellType] too by making it [CellType.Unknown]
+    FLAGGED
 }

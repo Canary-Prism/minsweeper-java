@@ -48,9 +48,19 @@ public interface Solver {
     /// Solve from a [GameState]
     ///
     /// @param state the state to solve
-    /// @return a move to make
+    /// @return a move to make, or null if one cannot be found
     @Nullable Move solve(GameState state);
     
+    /// Solve a [Minsweeper] game
+    ///
+    /// This method will continue to send moves to the passed `minsweeper` until:
+    /// - the game is won where [Result#WON] is returned
+    /// - the game is lost where [Result#LOST] is returned
+    /// - the solver is unable to figure out a move but the game is still ongoing
+    ///   or for any other reason the game cannot be won where [Result#RESIGNED] is returned
+    ///
+    /// @param minsweeper the game to solve
+    /// @return the result of the solve
     default Result solve(Minsweeper minsweeper) {
         var state = minsweeper.getGameState();
         while (state.status() == GameStatus.PLAYING) {
@@ -72,15 +82,30 @@ public interface Solver {
         };
     }
     
+    /// Gets the name of the [Solver]
+    ///
+    /// @return the name of the Solver
+    /// @implSpec implementations of Solver should return a human readable pretty name
     default String getName() {
         return this.getClass().getName();
     }
     
+    /// Gets the description of the [Solver]
+    ///
+    /// @return the description of the Solver
+    /// @implSpec implementations of Solver should provide a human readable description
+    ///           for the logic the Solver uses and such
     default String getDescription() {
         return "no description provided";
     }
     
+    /// Result of [#solve(Minsweeper)]
     enum Result {
-        WON, LOST, RESIGNED
+        /// The game was won
+        WON,
+        /// The game was lost
+        LOST,
+        /// The game was forfeited
+        RESIGNED
     }
 }

@@ -16,6 +16,22 @@
 
 package canaryprism.minsweeper;
 
+/// The status of the game
+///
+/// Just like whether it's still ongoing or won or lost or whatever idk
+///
+/// @see GameState
 public enum GameStatus {
-    PLAYING, WON, LOST, NEVER
+    
+    /// Minsweeper game is still ongoing
+    PLAYING,
+    
+    /// Minsweeper game has been won
+    WON,
+    
+    /// Minsweeper game has been lost
+    LOST,
+    
+    /// Minsweeper game hasn't been started yet
+    NEVER
 }

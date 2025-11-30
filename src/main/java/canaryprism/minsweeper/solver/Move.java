@@ -19,6 +19,12 @@ package canaryprism.minsweeper.solver;
 import java.util.Optional;
 import java.util.Set;
 
+/// A Move is a collection of [Click]s to perform on a [canaryprism.minsweeper.Minsweeper] game
+///
+/// It can also contain an optional [Reason] that explains the reasoning behind the Move
+///
+/// @param clicks the [Click]s to perform on the game
+/// @param reason the optional [Reason] the move can be performed
 public record Move(Set<Click> clicks, Optional<Reason> reason) {
     public Move(Set<Click> clicks, Reason reason) {
         this(clicks, Optional.of(reason));
@@ -38,15 +44,28 @@ public record Move(Set<Click> clicks, Optional<Reason> reason) {
     public Move(int x, int y, Action action, Reason reason) {
         this(Set.of(new Click(x, y, action)), Optional.of(reason));
     }
+    
+    /// A single click to be performed on a [canaryprism.minsweeper.Minsweeper] game
+    ///
+    /// @param point the coordinates to perform the click
+    /// @param action the action to use for the click
     public record Click(Point point, Action action) {
         public Click(int x, int y, Action action) {
             this(new Point(x, y), action);
         }
     }
+    /// Coordinate for [Click]s
+    ///
+    /// @param x the x coordinate
+    /// @param y the y coordinate
     public record Point(int x, int y) {
     
     }
+    /// Action to use for a [Click]
     public enum Action {
-        LEFT, RIGHT
+        /// [Left click][canaryprism.minsweeper.Minsweeper#leftClick(int, int)]
+        LEFT,
+        /// [Right click][canaryprism.minsweeper.Minsweeper#rightClick(int, int)]
+        RIGHT
     }
 }

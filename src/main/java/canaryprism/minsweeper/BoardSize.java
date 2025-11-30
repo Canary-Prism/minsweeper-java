@@ -17,6 +17,10 @@
 package canaryprism.minsweeper;
 
 /// Represents a validated size of board and mine count that u can make a [MinsweeperGame] with
+///
+/// @param width the width of the board
+/// @param height the height of the board
+/// @param mines the amount of mines in the board
 public record BoardSize(int width, int height, int mines) {
     public BoardSize {
         if (width <= 0 || height <= 0)

@@ -16,6 +16,10 @@
 
 package canaryprism.minsweeper;
 
+/// Represents a cell in a [Board]
+///
+/// @param type the inherent type of the cell, may be [CellType.Unknown] if [#state] is [CellState#UNKNOWN]
+/// @param state the current state of the cell
 public record Cell(CellType type, CellState state) {
 
 }

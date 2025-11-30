@@ -16,12 +16,22 @@
 
 package canaryprism.minsweeper;
 
+/// Represents conventional [BoardSize]s common between minesweeper implementations
+///
+/// These include the [#BEGINNER] [#INTERMEDIATE] and [#EXPERT] sizes.
 public enum ConventionalSize {
+    
+    /// The Beginner size in conventional minesweeper implementations
     BEGINNER(new BoardSize(9, 9, 10)),
+    
+    /// The Intermediate size in conventional minesweeper implementations
     INTERMEDIATE(new BoardSize(16, 16, 40)),
+    
+    /// The Expert size in conventional minesweeper implementations
     EXPERT(new BoardSize(30, 16, 99))
     ;
     
+    /// The [BoardSize] the ConventionalSize represents
     public final BoardSize size;
     
     ConventionalSize(BoardSize size) {

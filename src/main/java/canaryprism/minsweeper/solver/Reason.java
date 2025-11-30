@@ -18,6 +18,10 @@ package canaryprism.minsweeper.solver;
 
 import java.util.Set;
 
+/// Reasoning that a [Move] can be performed
+///
+/// @param logic the logic used for the reason
+/// @param related the coordinates of the cells that were used in order to figure out this Reason
 public record Reason(Logic logic, Set<Move.Point> related) {
     public Reason(Logic logic) {
         this(logic, Set.of());

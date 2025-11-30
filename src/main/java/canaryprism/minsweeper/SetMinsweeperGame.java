@@ -16,19 +16,34 @@
 
 package canaryprism.minsweeper;
 
+/// Minsweeper game with a preset given state
+///
+/// This implementation takes a [GameState] directly and does not support [#start()]
+///
+/// All other moves work normally tho
 public class SetMinsweeperGame extends AbstractHidingMinsweeper {
     
+    /// Constructs a new SetMinsweeperGame with given [GameState] and Runnables invoked for winning and losing
+    ///
+    /// @param state the state of the game
+    /// @param on_win Runnable to be invoked on win
+    /// @param on_lose Runnable to be invoked on lose
     public SetMinsweeperGame(GameState state, Runnable on_win, Runnable on_lose) {
         super(state.board().getSize(), on_win, on_lose);
         this.gamestate = state;
     }
     
+    /// Constructs a new SetMinsweeperGame with given [GameState]
+    ///
+    /// @param state the state of the game
     public SetMinsweeperGame(GameState state) {
         this(state, () -> {}, () -> {});
     }
     
+    /// Not supported :3
+    /// @throws UnsupportedOperationException hehe :3
     @Override
     public GameState start() {
-        throw new UnsupportedOperationException();
+        throw new UnsupportedOperationException("start() is unsupported for SetMinsweeperGame");
     }
 }

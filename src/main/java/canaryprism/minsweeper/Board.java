@@ -20,6 +20,9 @@ import java.util.ArrayList;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+/// Represents the board of a [Minsweeper] game
+///
+/// A board holds [Cell]s and can be [clone][#clone()]ed
 public class Board extends ArrayList<ArrayList<Cell>> {
     
     private final BoardSize size;
@@ -29,6 +32,10 @@ public class Board extends ArrayList<ArrayList<Cell>> {
         this.size = size;
     }
     
+    /// Constructs a Board with a given size and cell to fill with
+    ///
+    /// @param size the size of the board
+    /// @param fill the [Cell] to fill the board with
     public Board(BoardSize size, Cell fill) {
         this(size, ((Void) null));
         
@@ -43,10 +50,19 @@ public class Board extends ArrayList<ArrayList<Cell>> {
                 .limit(height)
                 .forEach(this::add);
     }
+    /// Constructs a Board with a given size
+    ///
+    /// The board is filled with [Cell]s with type [CellType.Safe(0)][CellType.Safe#EMPTY]
+    /// and state [CellState#UNKNOWN]
+    ///
+    /// @param size the size of the board
     public Board(BoardSize size) {
         this(size, new Cell(CellType.Safe.EMPTY, CellState.UNKNOWN));
     }
     
+    /// Gets the [BoardSize] of the Board
+    ///
+    /// @return the board's size
     public BoardSize getSize() {
         return size;
     }

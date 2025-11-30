@@ -17,6 +17,12 @@
 package canaryprism.minsweeper;
 
 /// Represents the state of the game
+///
+/// @param status the status of the game
+/// @param board the board of the game
+/// @param remainingMines the amount of mines remaining.
+///                       this is calculated by subtracting the total amount of mines in the board
+///                       by the amount of [Cell]s that are [FLAGGED][CellState#FLAGGED]
 public record GameState(GameStatus status, Board board, int remainingMines) implements Cloneable {
     
     GameState withStatus(GameStatus status) {

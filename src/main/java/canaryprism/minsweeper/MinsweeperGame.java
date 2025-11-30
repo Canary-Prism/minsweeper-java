@@ -18,23 +18,103 @@ package canaryprism.minsweeper;
 
 import canaryprism.minsweeper.solver.Solver;
 
-/// Main class of minsweeper game
+/// # Main class of minsweeper game
+///
+/// This is the primary implementation of [Minsweeper] and it has the most complete features
+///
+/// ## How use and whatever
+///
+/// You start by creating a [BoardSize]
+/// ```
+/// BoardSize size = new BoardSize(9, 9, 10);
+/// ```
+/// or use a predefined size in [ConventionalSize]
+/// ```
+/// BoardSize size = ConventionalSize.BEGINNER.size
+/// ```
+///
+/// Then you can create a MinsweeperGame instance
+/// ```
+/// MinsweeperGame game = new MinsweeperGame(size);
+/// ```
+///
+/// The created MinsweeperGame has not started yet, its [#gamestate]'s [GameState#status] is [GameStatus#NEVER].
+/// Any move attempted like [#reveal(int, int)] [#clearAround(int, int)] or [#setFlagged(int, int, boolean)]
+/// will simply not do anything
+///
+/// To start the game just call [#start()] or [#start(Solver)]
+/// ```
+/// game.start(Solver.getDefault()); // starts the game with the default solver
+/// ```
+/// oh right speaking of
+///
+/// ### [Solvers][Solver]
+///
+/// Solvers can be used to start a game by using [#start(Solver)] instead of [#start()].
+/// This guarantees that the game you play is solvable by the provided solver.
+/// This is done by repeatedly generating new random games until one is found that is solvable,
+/// when the player first [#reveal(int, int)]s a cell.
+///
+/// Since this means the generation of a game is postponed until the first [reveal][#reveal(int, int)],
+/// [#setFlagged(int, int, boolean)] doesn't do anything before a reveal as the board technically isn't even made yet
+///
+/// Also, since the first reveal is only able to processed once a solvable board is randomly found,
+/// the [#reveal(int, int)] and [#leftClick(int, int)] methods may block for an extended period of time
+/// as it keeps generating boards until one is solvable by the solver.
+/// To make this easier to work with, the board generation process may be [interrupted][Thread#interrupt()],
+/// where a [GenerationInterruptedException] is thrown
+///
+/// ## Weirdness
+///
+/// Since this is the main class i figured i'd just throw in all of the more different bits of this minesweeper
+/// implementation compared to other common implementations so nobody gets confused or whatever
+///
+/// - after winning a game, since the true [#gamestate] is returned directly,
+///   MinsweeperGame doesn't pretend leftover mines are flagged when they weren't
+/// - continuing from the last weirdness, this means the [GameState#remainingMines]
+///   is also not set to 0 if not all mines were flagged
+/// - the first move is *still* not guaranteed safe or a zero, to achieve this the Solver api may be abused
+///   see [canaryprism.minsweeper.solver.impl.start]
+///
 public final class MinsweeperGame extends AbstractRandomMinsweeper {
     
     private Solver solver;
     
+    /// Constructs a new MinsweeperGame with given size and Runnables invoked for winning and losing
+    ///
+    /// @param sizes the size of the board
+    /// @param on_win Runnable to be invoked on win
+    /// @param on_lose Runnable to be invoked on lose
     public MinsweeperGame(BoardSize sizes, Runnable on_win, Runnable on_lose) {
         super(sizes, on_win, on_lose);
     }
     
+    /// Constructs a new MinsweeperGame with given size
+    ///
+    /// @param sizes the size of the board
+    /// @see #MinsweeperGame(BoardSize, Runnable, Runnable)
     public MinsweeperGame(BoardSize sizes) {
         this(sizes, () -> {}, () -> {});
     }
     
+    /// Constructs a new MinsweeperGame with given size and Runnables invoked for winning and losing
+    ///
+    /// The size of the board will be the [ConventionalSize#size] of the passed `size`
+    ///
+    /// @param size the size of the board
+    /// @param on_win Runnable to be invoked on win
+    /// @param on_lose Runnable to be invoked on lose
+    /// @see #MinsweeperGame(BoardSize, Runnable, Runnable)
     public MinsweeperGame(ConventionalSize size, Runnable on_win, Runnable on_lose) {
         this(size.size, on_win, on_lose);
     }
     
+    /// Constructs a new MinsweeperGame with given size
+    ///
+    /// The size of the board will be the [ConventionalSize#size] of the passed `size`
+    ///
+    /// @param size the size of the board
+    /// @see #MinsweeperGame(BoardSize)
     public MinsweeperGame(ConventionalSize size) {
         this(size.size);
     }
@@ -43,6 +123,12 @@ public final class MinsweeperGame extends AbstractRandomMinsweeper {
     public GameState start() {
         return start(null);
     }
+    
+    /// Start or restart a Minsweeper game with a given [Solver]
+    ///
+    /// The game will be guaranteed solvable by the passed `solver`
+    ///
+    ///
     public GameState start(Solver solver) {
         this.solver = solver;
         
@@ -55,6 +141,11 @@ public final class MinsweeperGame extends AbstractRandomMinsweeper {
     
     private volatile boolean first;
     
+    /// {@inheritDoc}
+    ///
+    /// @throws GenerationInterruptedException if the thread is interrupted
+    ///                                        while the board generation process
+    ///                                        is ongoing
     @Override
     public GameState reveal(int x, int y) {
         if (gamestate.status() != GameStatus.PLAYING) return getGameState();
@@ -135,6 +226,9 @@ public final class MinsweeperGame extends AbstractRandomMinsweeper {
         return super.reveal(x, y);
     }
     
+    /// {@inheritDoc}
+    ///
+    /// Does nothing if there hasn't been a [#reveal(int, int)] yet this game
     @Override
     public GameState setFlagged(int x, int y, boolean flagged) {
         if (first)

@@ -18,16 +18,34 @@ package canaryprism.minsweeper;
 
 import java.util.HashSet;
 
+/// Abstract partial implementation of [Minsweeper]
+///
+/// Implements all operations of Minsweeper except for [#start()],
+/// and does **not** hide any [GameState] information from the player even when a game is still ongoing
+///
+/// has [#on_win] and [#on_lose] [Runnable]s that is invoked when a game is won or lost respectively
+///
+/// @see AbstractHidingMinsweeper
 public abstract class AbstractMinsweeper implements Minsweeper {
     
+    /// The size of the board
     protected final BoardSize sizes;
     
+    /// Runnable invoked when a game is won
     protected final Runnable on_win;
+    /// Runnable invoked when a game is lost
     protected final Runnable on_lose;
     
+    /// The current state of the game
     protected GameState gamestate;
     
-    
+    /// Constructs an AbstractMinsweeper with the provided sizes
+    ///
+    /// has win/lose [Runnable]s that are invoked when a game is won or lost respectively
+    ///
+    /// @param sizes the size of the board
+    /// @param on_win Runnable to be invoked on win
+    /// @param on_lose Runnable to be invoked on lose
     public AbstractMinsweeper(BoardSize sizes, Runnable on_win, Runnable on_lose) {
         this.sizes = sizes;
         this.gamestate = new GameState(GameStatus.NEVER, new Board(sizes), 0);
