@@ -16,6 +16,17 @@
 
 package canaryprism.minsweeper.solver;
 
+/// The specific logic used in the [Reason]
+///
+/// Not really sure what to do with it but u can get the [description][#getDescription()] of the Logic
+/// for hints and stuff
 public interface Logic {
+    /// Gets the description of the Logic
+    ///
+    /// @return the description
+    /// @implSpec Implementations should return a human readable description for why a [Move] can be made.
+    ///           There's no real rule for how specific the description has to be, but it doesn't have to
+    ///           be specific to each specific [Move] and can just be tied to say a specific part of the
+    ///           [Solver]'s code that creates the Move
     String getDescription();
 }

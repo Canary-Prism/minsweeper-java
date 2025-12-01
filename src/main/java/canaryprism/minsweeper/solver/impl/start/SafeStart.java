@@ -23,6 +23,10 @@ import canaryprism.minsweeper.solver.Move;
 import canaryprism.minsweeper.solver.Solver;
 import org.jetbrains.annotations.Nullable;
 
+/// SafeStart ensures the first move in [canaryprism.minsweeper.MinsweeperGame] is [safe][canaryprism.minsweeper.CellType.Safe]
+///
+/// It does not do anything else and isn't a real [Solver]
+/// @see ZeroStart
 public final class SafeStart implements Solver {
     
     @Override

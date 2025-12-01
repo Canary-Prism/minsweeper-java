@@ -38,6 +38,8 @@ import static java.lang.Math.min;
 /// [Minesweeper Solver by Patrick Stillhart ](https://github.com/arcs-/Minesweeper-Solver/blob/master/src/State.java)
 ///
 /// adapted to minsweeper by Mia
+///
+/// Actually i'm like 99% sure i broke something and this doesn't work as intended i should fix it at some point,,
 public class MineSweeperSolver implements Solver {
     
     

@@ -25,6 +25,10 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.Collection;
 
+/// ZeroStart ensures the first move in [canaryprism.minsweeper.MinsweeperGame] is [empty][canaryprism.minsweeper.CellType.Safe#EMPTY]
+///
+/// It does not do anything else and isn't a real [Solver]
+/// @see SafeStart
 public final class ZeroStart implements Solver {
     
     @Override
